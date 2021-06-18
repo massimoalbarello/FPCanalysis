@@ -58,6 +58,11 @@ while bad_topology
             end
         end
     end
+    
+    Summation = 1;
+    for i = 1:n
+        if(
+    end
 
     % Checking the number of out neighbours including i itself, and irreducibility, if not good,
     % we call the function again in recursive fashion
@@ -79,6 +84,7 @@ while bad_topology
     
 end
 
+%% EVOLUTION OF THE STATE
     %State evolution of the dicrete time system (Randomized)
     x_k = zeros(n , t_end); 
     x_k(: , 1) = x_0;           %Initial state = Initial conditions

@@ -2,7 +2,7 @@
 % Defining the Adjacency matrix dimensions (n nodes)
 n = 50;
 % Defining the number of nodes to be sampled
-p = 30;
+p = 20;
 %Fix simulation length
 t_end = 500;       
 %plotting variable
@@ -53,24 +53,31 @@ while bad_topology
     Irreducibility = 1; %if one the matrix is irreducible, if zero it is reducible
     for i = 1:n
         for j = 1:n
-            if power_A(i,j)
+            if power_A(i,j)== 0
                 Irreducibility = 0;
             end
         end
     end
 
-    % Checking the number of out neighbours including i itself, and irreducibility, if not good,
-    % we call the function again in recursive fashion
+    % Checking the number of out neighbours including i itself
     sum_row = sum(topology , 2);
-    if ((sum_row < (p+1)*ones(n,1)) & (Irreducibility == 1))
+    Summation = 1;
+    for i = 1:n
+        if(sum_row(i)<(p+1))
+            Summation = 0;
+        end
+    end
+
+    
+    if ((Summation==0) & (Irreducibility == 1))
         fprintf('Need more neighbours, Irreducible\n');
-    elseif ((sum_row >= (p+1)*ones(n,1)) & (Irreducibility == 1))
+    elseif ((Summation==1) & (Irreducibility == 1))
         fprintf('Enough neighbours, Irreducible\n');
         topology = topology;
         bad_topology = false;
-    elseif ((sum_row < (p+1)*ones(n,1)) & (Irreducibility == 0))
+    elseif ((Summation==0) & (Irreducibility == 0))
         fprintf('Need more neighbours, Not Irreducible\n');
-    elseif ((sum_row >= (p+1)*ones(n,1)) & (Irreducibility == 0))
+    elseif ((Summation==1) & (Irreducibility == 0))
         fprintf('Enough neighbours, Not Irreducible\n');
     else
          fprintf('I forgot one case\n');
