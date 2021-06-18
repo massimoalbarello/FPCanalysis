@@ -2,12 +2,13 @@
 % Defining the Adjacency matrix dimensions (n nodes)
 n = 50;
 % Defining the number of nodes to be sampled
-p = 5;
+p = 30;
 %Fix simulation length
 t_end = 500;       
 %plotting variable
 plotting = false;
 lap = false;
+complete = true;
 
 % Defining the initial conditions on the opinions
 x_0 = zeros(n , 1);
@@ -15,15 +16,14 @@ x_0 = zeros(n , 1);
 %Seed for initial conditions
 x_0 = [1;0;1;0;1;0;1;0;0;1;0;0;1;1;1;1;1;1;0;1;0;0;1;1;1;1;0;1;1;1;0;1;0;0;1;0;0;1;1;0;1;0;1;0;1;1;0;1;0;1];
     
+if complete
+    %Computing the random masks sequence and A(k)
+    mask_sequence = zeros(n , n , t_end);
+    for i = 1:t_end
+        mask_sequence(: , : , i) = mask_samples(n , p);
+    end
+    A_sequence = mask_sequence * (1/(p+1));
 
-%Computing the random masks sequence and A(k)
-mask_sequence = zeros(n , n , t_end);
-for i = 1:t_end
-    mask_sequence(: , : , i) = mask_samples(n , p);
-end
-A_sequence = mask_sequence * (1/(p+1));
-
-if lap
     % Computing the average of the sequence of masks to check if correct
     % distribution
     average_mask = p/(n-1)*(ones(n)-eye(n))+eye(n);
@@ -34,6 +34,12 @@ if lap
     col_sums = sum(average_A,1);
     row_sum = sum(A_sequence,2);
     col_sum = sum(A_sequence,1);
+
+end
+
+
+% Generating a suitable underlying graph
+topology = gen_graph(n,p)
 
     %State evolution of the dicrete time system (Randomized)
     x_k = zeros(n , t_end); 
@@ -51,6 +57,7 @@ if lap
     end
     % x_k_expected;
 
+
     %Plotting the DTime evolution of all the states (Comparing with average
     %matrix)
 
@@ -59,6 +66,23 @@ if lap
         figure(2); plot(0:1:t_end , x_k_expected, 'LineWidth' , 2); grid on;
     end
 
+% Eigenvalue analysis of the E{(A)}
+%average_A is positive and has only one eigenvalue with |.|=1
+[V , D , W] = eig(average_A); 
+lambda = eig(average_A);
+v = V(: , end);
+w = W(: , end);
+ 
+% Limit of (E{A})^k is:
+average_A_infinity = v*w';
+
+%plotting eigenvalues of E{A}
+if plotting
+    figure(20); circle(0, 0, 1); grid on; hold on; axis([-1.26 1.26 -1 1]); scatter(lambda, zeros(n,1), 'r', 'filled'); hold off;
+end
+
+
+if lap
     % Computing the Laplacian matrix associated to the sequence of A(k)
     L_sequence = zeros(n , n , t_end);
     for i = 1:t_end
