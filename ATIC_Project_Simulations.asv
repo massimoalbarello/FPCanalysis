@@ -79,7 +79,6 @@ while bad_topology
     
 end
 
-%% EVOLUTION OF THE STATE
     %State evolution of the dicrete time system (Randomized)
     x_k = zeros(n , t_end); 
     x_k(: , 1) = x_0;           %Initial state = Initial conditions
