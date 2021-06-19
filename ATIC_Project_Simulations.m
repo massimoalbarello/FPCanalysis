@@ -4,7 +4,7 @@ n = 10;
 % Defining the number of nodes to be sampled
 p = 3;
 %Fix simulation length
-t_end = 100000;       
+t_end = 100;       
 %plotting variable
 plotting = false;
 lap = false;
@@ -97,13 +97,13 @@ topology = [1,1,1,1,0,0,1,0,1,1;1,1,0,0,1,1,1,0,1,1;1,0,1,0,1,0,1,1,1,1;1,0,0,1,
 mask_sequence = zeros(n , n , t_end);
 
 for i = 1:t_end
-   mask_sequence( : , : , i )= mask_samples_arbitrary_net(topology , n , p);
+   [mask_sequence( : , : , i ) , average_mask] = mask_samples_arbitrary_net(topology , n , p);
 end
 
 A_sequence = (1/(p+1))*mask_sequence;
-average_mask = mean(mask_sequence, 3)
-
+average_A = (1/(p+1))*average_mask;
 end
+
 %% EVOLUTION OF THE STATE
     %State evolution of the dicrete time system (Randomized)
     x_k = zeros(n , t_end); 
