@@ -1,21 +1,23 @@
 %% RANDOMIZED MODEL ON A COMPLETE GRAPH
 % Defining the Adjacency matrix dimensions (n nodes)
-n = 50;
+n = 10;
 % Defining the number of nodes to be sampled
-p = 20;
+p = 3;
 %Fix simulation length
-t_end = 500;       
+t_end = 100000;       
 %plotting variable
 plotting = false;
 lap = false;
-complete = true;
+complete = false;
 
 % Defining the initial conditions on the opinions
 x_0 = zeros(n , 1);
 
 %Seed for initial conditions
-x_0 = [1;0;1;0;1;0;1;0;0;1;0;0;1;1;1;1;1;1;0;1;0;0;1;1;1;1;0;1;1;1;0;1;0;0;1;0;0;1;1;0;1;0;1;0;1;1;0;1;0;1];
-    
+x_0 = [1;0;1;0;1;0;1;0;0;1];
+
+
+%% GENERATING A COMPLETE TOPOLOGY AND SAMPLE FORM THE NEIGHBOURS, THE NODES ALWAYS SAMPLE THEMSELVES
 if complete
     %Computing the random masks sequence and A(k)
     mask_sequence = zeros(n , n , t_end);
@@ -35,16 +37,18 @@ if complete
     row_sum = sum(A_sequence,2);
     col_sum = sum(A_sequence,1);
 
-end
 
-%% GENERATING AN ARBITRARY TOPOLOGY (LOOK AT GRAPH_GEN FOR MORE DETAIL)
+%% GENERATING AN ARBITRARY TOPOLOGY (LOOK AT GRAPH_GEN FOR MORE DETAIL), THE NODES CAN SAMPLE FORM THE NEIGHBOURS ONLY, BUT ALWATS SAMPLE THEMSELVES
+else
+    
+% Variable to check if the requirements on the topology are met
 bad_topology = true;
 
 while bad_topology
     % Generating a suitable underlying graph
     [topology] = gen_graph(n,p);
 
-    %Checking irreducibility of topology binary matrix
+    %Checking irreducibility of the topology binary matrix
     power_A = eye(n);
     for i = 1:(n-1)
         power_A = power_A + topology^i;
@@ -86,6 +90,20 @@ while bad_topology
     
 end
 
+% Choose a network for the simulations from now on (play with it...)
+topology = [1,1,1,1,0,0,1,0,1,1;1,1,0,0,1,1,1,0,1,1;1,0,1,0,1,0,1,1,1,1;1,0,0,1,1,0,1,1,1,1;0,1,1,1,1,0,1,0,0,0;0,1,0,0,0,1,1,0,1,1;1,1,1,1,1,1,1,0,1,1;0,0,1,1,0,0,0,1,1,0;1,1,1,1,0,1,1,1,1,1;1,1,1,1,0,1,1,0,1,1];
+
+%Generate a sequence of averaging matrices {A(k)}
+mask_sequence = zeros(n , n , t_end);
+
+for i = 1:t_end
+   mask_sequence( : , : , i )= mask_samples_arbitrary_net(topology , n , p);
+end
+
+A_sequence = (1/(p+1))*mask_sequence;
+average_mask = mean(mask_sequence, 3)
+
+end
 %% EVOLUTION OF THE STATE
     %State evolution of the dicrete time system (Randomized)
     x_k = zeros(n , t_end); 
@@ -201,7 +219,7 @@ for k  = 1:t_end
     x_k_cloop(: , k+1) = A_cl_sequence(: , : , k) * x_k_cloop(: , k) + [B*Kp ; 1]*ref;
 end
 figure(5) ;  plot(0:1:t_end , x_k_cloop(1:5,:) ,  'LineWidth' , 2); grid on; hold on; legend();
-plot(0:1:t_end , x_k_cloop(51 , :) ,  'LineWidth' , 2);title('Global, NO saturation, Mean reference'); hold off;
+plot(0:1:t_end , x_k_cloop(n+1 , :) ,  'LineWidth' , 2);title('Global, NO saturation, Mean reference'); hold off;
 
 
 
@@ -221,7 +239,7 @@ for k  = 1:t_end
 end
 figure(6) ; 
 plot(0:1:t_end , x_k_cloop(1:5,:) ,  'LineWidth' , 2); grid on; hold on; legend();
-plot(0:1:t_end , x_k_cloop(51 , :) ,  'LineWidth' , 2);title('Global, Saturation ,Mean reference'); hold off;
+plot(0:1:t_end , x_k_cloop(n+1 , :) ,  'LineWidth' , 2);title('Global, Saturation ,Mean reference'); hold off;
 
 %% STEP 2
 % Assumptions:
@@ -255,7 +273,7 @@ for k  = 1:t_end
     x_k_cloop(: , k+1) = A_cl_sequence(: , : , k) * x_k_cloop(: , k) + [B*Kp ; 1]*ref;
 end
 figure(7) ; plot(0:1:t_end , x_k_cloop(1:5,:) ,  'LineWidth' , 2); grid on; hold on; legend();
-plot(0:1:t_end , x_k_cloop(51 , :) ,  'LineWidth' , 2);title('Myopic, NO saturation, Mean reference'); hold off;
+plot(0:1:t_end , x_k_cloop(n+1 , :) ,  'LineWidth' , 2);title('Myopic, NO saturation, Mean reference'); hold off;
 
 %% STEP 2.1
 % Same as 2 but with saturation on the selfish node
@@ -271,7 +289,7 @@ for k  = 1:t_end
     x_k_cloop(: , k+1) = sat_function(A_cl_sequence(: , : , k) * x_k_cloop(: , k) + [B*Kp ; 1]*ref);
 end
 figure(8); plot(0:1:t_end , x_k_cloop(1:5,:) ,  'LineWidth' , 2); grid on; hold on; legend();
-plot(0:1:t_end , x_k_cloop(51 , :) ,  'LineWidth' , 2); title('Myopic, Saturation, Mean reference') ;hold off;
+plot(0:1:t_end , x_k_cloop(n+1 , :) ,  'LineWidth' , 2); title('Myopic, Saturation, Mean reference') ;hold off;
 %% STEP 3
 % Assumptions:
 % - One selfish agent IOTA NODE
@@ -296,4 +314,4 @@ for k  = 1:t_end
     x_k_cloop(: , k+1) = A_cl_sequence(: , : , k) * x_k_cloop(: , k) + [B*Kp ; 1]*ref;
 end
 figure(9) ; plot(0:1:t_end , x_k_cloop(:,:) ,  'LineWidth' , 2); grid on; hold on; legend();
-plot(0:1:t_end , x_k_cloop(51 , :) ,  'LineWidth' , 2);title('Global, "Laplacian" reference'); hold off;
+plot(0:1:t_end , x_k_cloop(n+1 , :) ,  'LineWidth' , 2);title('Global, "Laplacian" reference'); hold off;
