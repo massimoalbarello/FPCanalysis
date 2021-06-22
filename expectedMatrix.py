@@ -25,6 +25,6 @@ def expectedMatrix(N, P):
     for i in range(iterations):
         expected += 1/iterations * randomMatrix(N, P)
     # print(expected)
-    return expected
+    return expected, []
 
 # expectedMatrix(10, 3)
