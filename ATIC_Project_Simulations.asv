@@ -4,12 +4,13 @@ n = 100;
 % Defining the number of nodes to be sampled
 p = 3;
 %Fix simulation length
-t_end = 5;       
+t_end = 30;       
 %plotting variable
 plotting = false;
 plotting_eig = false;
 lap = false;
 complete = true;
+not_complete = false;
 
 % Defining the initial conditions on the opinions
 x_0 = zeros(n , 1);
@@ -49,7 +50,7 @@ if complete
 
 
 %% GENERATING AN ARBITRARY TOPOLOGY (LOOK AT GRAPH_GEN FOR MORE DETAIL), THE NODES CAN SAMPLE FORM THE NEIGHBOURS ONLY, BUT ALWATS SAMPLE THEMSELVES
-else
+elseif not_complete
     
 % Variable to check if the requirements on the topology are met
 bad_topology = true;
@@ -215,6 +216,10 @@ ref=mean(x_0(n_selfish+1:end))*ones(n_selfish , 1);
 % Reference sequence (for plots)
 ref_seq = mean(x_0(n_selfish+1:end)) * ones(t_end+1 , 1);
 
+%Initializing Gains
+Kp = 2*eye(n_selfish);
+Ki = 0.01*eye(n_selfish);
+
 %% STEP 1 P CONTROLLER
 % Assumptions:
 % - n_selfish selfish agents IOTA NODE that are P-controlled
@@ -222,119 +227,13 @@ ref_seq = mean(x_0(n_selfish+1:end)) * ones(t_end+1 , 1);
 % - Global Selfish Agent,i.e. its control action is based on the whole network
 % - Underlying network is a complete graph
 % - The mean has to converge to a reference ref
-
-B = [eye(n_selfish) ; zeros(n - n_selfish , n_selfish)];
-C = (1/n)*[ones(n_selfish , n)];
-Kp = 2*eye(n_selfish);
-
-x_k_P = zeros(n , t_end+1);
-x_k_average_P = zeros(n , t_end+1); 
-y_k_average_P = zeros(n_selfish , t_end+1); 
-
-x_k_P(: , 1) = x_0;
-x_k_average_P(: , 1) = x_0;
-y_k_average_P(: , 1) = C * x_0;
-
-A_P_sequence = zeros(n , n , t_end);
-average_A_P = average_A-B*Kp*C;
-
-% Building the sequence of state matrices for P-Controlled Closed Loop 
-for k  = 1:t_end
-    A_P_sequence(: , : , k) = A_sequence(: , : , k)-B*Kp*C;
-    x_k_P(: , k+1) = A_P_sequence(: , : , k) * x_k_P(: , k) + B*Kp*ref;
-    x_k_average_P(: , k+1) = average_A_P * x_k_average_P(: , k) + B*Kp*ref;
-    y_k_average_P(: , k+1) = C * x_k_average_P(: , k+1);
+if complete
+    [x_k_average_P , y_k_average_P , average_A_P] = P_global(n , p , t_end , x_0 , n_selfish , ref , Kp);
 end
-
-figure(4) ;  hold on;
-plot(0:1:t_end , x_k_average_P(1 ,:) ,  'LineWidth' , 1.5); hold on;
-plot(0:1:t_end, x_k_average_P(n_selfish+1 ,:),  'LineWidth' , 1.5); 
-plot(0:1:t_end , y_k_average_P(1 ,:) , 'LineWidth' , 1.5);
-plot(0:1:t_end, ref_seq, 'k .' , 'LineWidth' , 1.5);
-legend( 'Coordinator 1' ,'Coordinator 2' ,'Coordinator 3' , 'Standard Agent 1' , 'Network average' , 'Reference');
-% title('Global, NO saturation, Mean reference, P');
-hold off;
-
-
-%% STEP 2 PI CONTROLLER
-% Assumptions:
-% - n_selfish selfish agents IOTA NODE that are PI-CONTROLLED
-% - Randomized Adjacency
-% - Global Selfish Agent,i.e. its control action is based on the whole network
-% - Underlying network is a complete graph
-% - The mean has to converge to a reference ref
-
-
-%Initial condition for the augmented states
-x_0_aug=[x_0; zeros(n_selfish,1)];
-x_k_PI = zeros(n + n_selfish , t_end+1);
-x_k_average_PI = zeros(n + n_selfish , t_end+1); 
-x_k_PI(: , 1) = x_0_aug;
-x_k_average_PI(: , 1) = x_0_aug;
-
-
-% Define the closed loop system state space representation (A , B , C , D)
-B = [eye(n_selfish) ; zeros(n - n_selfish , n_selfish)];
-C = (1/n)*[ones(n_selfish , n)];
-Kp = 2*eye(n_selfish);
-Ki = 0.01*eye(n_selfish);
-
-
-A_PI_sequence = zeros(n + n_selfish , n + n_selfish , t_end);
-average_A_PI = [average_A-B*Kp*C , B*Ki ; -C , eye(n_selfish)];
-perturbation = [zeros(n_selfish , n) , Ki ; zeros(n , n+n_selfish)];
-average_A_PI_np = average_A_PI-perturbation;
-
-% Building the sequernce of state matrices for PI-Controlled Closed Loop 
-for k  = 1:t_end
-    A_PI_sequence(: , : , k) = [A_sequence(: , : , k)-B*Kp*C , B*Ki ; -C , eye(n_selfish)];
-    x_k_PI(: , k+1) = A_PI_sequence(: , : , k) * x_k_PI(: , k) + [B*Kp ; eye(n_selfish)]*ref;
-    x_k_average_PI(: , k+1) = average_A_PI * x_k_average_PI(: , k) + [B*Kp ; eye(n_selfish)]*ref;
-end
-
- 
-eigen_average_A_PI_np = eig(average_A_PI_np)
-eigen_average_A_PI = eig(average_A_PI)
-if plotting_eig
-    figure(21);
-    circle(0 , 0 , 1); 
-    hold on; grid on; title( 'Eigenvalues of closed loop system using Expectation'); axis([-1.26 1.26 -1 1]);
-    plot(eig(average_A_PI) , 'r.', 'MarkerSize' , 1);
-    hold off;
-end
-
-%% Checking values of the gains that make the system in STEP 1 unstable
-% if kp = 10 then ki can range between 0 and 10.22, before we go unstable
-% if kp = 1 then ki can range between 0 and 0.8, before we go unstable
-if plotting_eig
-    figure(22);
-    circle(0 , 0 , 1); 
-    hold on; grid on; title( 'Checking values of k_I and k_P that make STEP 1 unstable'); axis([-1.26 1.26 -1 1]);
-    for kp = 0:10
-        for ki = 0:0.5:1
-            average_A_cl_tuned = [average_A-B*kp*C , B*ki ; -C , 1];
-            plot(eig(average_A_cl_tuned) , '.', 'MarkerSize' , 1);
-        end
-    end
-    hold off;
-end
-
-
-figure(5) ;  plot(0:1:t_end , x_k_average_PI(1,:) , 'LineWidth' , 1.5); hold on; 
-plot(0:1:t_end , x_k_average_PI(n_selfish+1,:) , 'LineWidth' , 1.5);
-plot(0:1:t_end, ref_seq,  'LineWidth' , 1.5);
-plot(0:1:t_end , x_k_average_PI(n+1,:) , 'LineWidth' , 1.5);
-title('Global, NO saturation, Mean reference, PI'); 
-legend('Coordinator 1' , 'Standard Agent 1', 'Reference' , 'Integrated Error'  );
-hold off;
-
-
 
 %% STEP 1.1
-%Same as before, but now we introduce a saturation to the selfish node
+%Same assumptions as in STEP 1, but now we introduce a saturation to the selfish node
 %opinion so that it can't go higher than 1 or lower than 0
-Kp = 10;
-Ki = 0.01;
 
 x_0_aug=[x_0;zeros(n_selfish,1)];
 x_k_PI = zeros(n + n_selfish , t_end+1);
@@ -350,6 +249,49 @@ end
 figure(6) ; 
 plot(0:1:t_end , x_k_average_PI(1:5,:) ,  'LineWidth' , 2); grid on; hold on; legend();
 plot(0:1:t_end , x_k_PI(n+1 , :) ,  'LineWidth' , 2); title('Global, Saturation ,Mean reference'); hold off;
+
+
+%% STEP 2 PI CONTROLLER
+% Assumptions:
+% - n_selfish selfish agents IOTA NODE that are PI-CONTROLLED
+% - Randomized Adjacency
+% - Global Selfish Agent,i.e. its control action is based on the whole network
+% - Underlying network is a complete graph
+% - The mean has to converge to a reference ref
+
+if complete
+    [x_k_average_PI , y_k_average_PI , average_A_PI , average_A_PI_np] = PI_global(n , p , t_end , x_0 , n_selfish , ref , Kp , Ki);
+end
+
+% Checking if average_A_PI is Hurwitz, i.e. convergent
+if plotting_eig
+    eigen_average_A_PI_np = eig(average_A_PI_np);
+    eigen_average_A_PI = eig(average_A_PI);
+    if plotting_eig
+        figure(21);
+        circle(0 , 0 , 1); 
+        hold on; grid on; title( 'Eigenvalues of closed loop system using Expectation'); axis([-1.26 1.26 -1 1]);
+        plot(eig(average_A_PI) , 'r.', 'MarkerSize' , 1);
+        hold off;
+    end
+end
+
+
+%% Checking values of the gains that make the system in STEP 2 unstable
+% if kp = 10 then ki can range between 0 and 10.22, before we go unstable
+% if kp = 1 then ki can range between 0 and 0.8, before we go unstable
+if plotting_eig
+    figure(22);
+    circle(0 , 0 , 1); 
+    hold on; grid on; title( 'Checking values of k_I and k_P that make STEP 1 unstable'); axis([-1.26 1.26 -1 1]);
+    for kp = 0:10
+        for ki = 0:0.5:1
+            average_A_cl_tuned = [average_A-B*kp*C , B*ki ; -C , 1];
+            plot(eig(average_A_cl_tuned) , '.', 'MarkerSize' , 1);
+        end
+    end
+    hold off;
+end
 
 %% STEP 2
 % Assumptions:
