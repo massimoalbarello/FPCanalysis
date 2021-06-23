@@ -33,7 +33,7 @@ average_A_PI = [average_A-B*Kp*C , B*Ki ; -C , eye(n_selfish)];
 perturbation = [zeros(n_selfish , n) , Ki ; zeros(n , n+n_selfish)];
 average_A_PI_np = average_A_PI-perturbation;
 
-% Building the sequernce of state matrices for PI-Controlled Closed Loop 
+% Building the sequence of state matrices for PI-Controlled Closed Loop 
 for k  = 1:t_end
     % A_PI_sequence(: , : , k) = [A_sequence(: , : , k)-B*Kp*C , B*Ki ; -C , eye(n_selfish)];
     % x_k_PI(: , k+1) = A_PI_sequence(: , : , k) * x_k_PI(: , k) + [B*Kp ; eye(n_selfish)]*ref;
@@ -49,7 +49,7 @@ plot(0:1:t_end, x_k_average_PI(n+1 ,:),  'LineWidth' , 1.5);
 plot(0:1:t_end , y_k_average_PI(1 ,:) , 'LineWidth' , 1.5);
 plot(0:1:t_end, ref_seq, 'k .' , 'MarkerSize' , 1.1);
 legend( 'Coordinator 1' ,'Coordinator 2' ,'Coordinator 3' , 'Standard Agent 1' , 'Integrated Error Coordinator 1' , 'Network average' , 'Reference');
-% title('Global, NO saturation, Mean reference, PI');
+title('Global, NO saturation, Mean reference, PI');
 hold off;
 
 end

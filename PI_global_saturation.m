@@ -1,19 +1,11 @@
-% Defining the Adjacency matrix dimensions (n nodes)
-n = 100;
-% Defining the number of nodes to be sampled
-p = 3;
-%Fix simulation length
-t_end = 50; 
+function [x_k_average_PI, y_k_average_PI, average_A_PI , average_A_PI_np] = PI_global_saturation(n , p , t_end , x_0 , n_selfish , ref , Kp , Ki)
 
-%Seed for initial conditions in which we have a clear majority for op. 1
-x_0 = [0;1;1;1;1;1;1;1;0;1;1;1;1;0;0;1;1;1;0;1;1;1;0;1;1;1;0;1;1;1;0;1;1;1;0;0;0;0;1;1;0;0;1;0;1;0;1;1;1;1;1;1;1;1;1;1;1;0;1;1;1;0;1;0;1;0;0;1;1;1;0;1;1;1;0;1;1;0;1;1;1;0;1;1;0;1;1;1;1;1;0;1;0;1;1;0;1;1;1;1];
-
-% Reference and Coordinating Nodes initialization
-% number of coordinators
-n_selfish = 5;
-
-% Refererence chosen to be the mean of the standard agents
-ref=mean(x_0(n_selfish+1:end))*ones(n_selfish , 1);
+%Function giving the following output of a PI-controlled system with global
+%visibility:
+% - plot of opinion dynamics in the PI-controlled system
+% - opinion values evolution
+% - opinion subject to stauration a 0 and 1
+% - network average evolution
 
 % Reference sequence (for plots)
 ref_seq = mean(x_0(n_selfish+1:end)) * ones(t_end+1 , 1);
@@ -31,11 +23,9 @@ Ki = 0.01*eye(n_selfish);
 % Definition of variables for storage of the augmented state evolution and the Measurements
 % evolution
 x_0_aug=[x_0; zeros(n_selfish,1)];
-%x_k_PI = zeros(n + n_selfish , t_end+1);
 x_k_average_PI = zeros(n + n_selfish , t_end+1);
 x_k_average_PI_sat = zeros(n + n_selfish , t_end+1);
 y_k_average_PI = zeros(n_selfish , t_end+1);
-%x_k_PI(: , 1) = x_0_aug;
 x_k_average_PI(: , 1) = x_0_aug;
 x_k_average_PI_sat = x_0_aug;
 y_k_average_PI(: , 1) = C*x_0;
@@ -58,10 +48,13 @@ end
 %Plotting opinion Dynamics and integrated error
 figure(103) ;  hold on;
 plot(0:1:t_end , x_k_average_PI_sat(1:3 ,:) ,  'LineWidth' , 1.5); hold on;
-plot(0:1:t_end, x_k_average_PI_sat(n_selfish+1 ,:),  'LineWidth' , 1.5);
-plot(0:1:t_end, x_k_average_PI_sat(n+1:n+ ,:),  'LineWidth' , 1.5);
+plot(0:1:t_end, x_k_average_PI_sat(n_selfish+1:n_selfish+3 ,:),  'LineWidth' , 1.5);
+plot(0:1:t_end, x_k_average_PI_sat(n+1:n+3 ,:),  'LineWidth' , 1.5);
 plot(0:1:t_end , y_k_average_PI(1 ,:) , 'LineWidth' , 1.5);
 plot(0:1:t_end, ref_seq, 'k .' , 'MarkerSize' , 0.7);
-legend( 'Coordinator 1' ,'Coordinator 2' ,'Coordinator 3' , 'Standard Agent 1' , 'Integrated Error Coordinator 1' , 'Network average' , 'Reference');
-% title('Global, NO saturation, Mean reference, P');
+legend( 'Coordinator 1' ,'Coordinator 2' ,'Coordinator 3' , 'Standard Agent 1' , 'Standard Agent 2' , 'Standard Agent 3' , 'Integrated Error Coordinator 1' , 'Integrated Error Coordinator 2' ,  'Integrated Error Coordinator 3' , 'Network average' , 'Reference');
+title('Global, saturation, Mean reference, PI');
 hold off;
+
+end
+

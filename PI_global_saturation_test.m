@@ -31,13 +31,11 @@ Ki = 0.01*eye(n_selfish);
 % Definition of variables for storage of the augmented state evolution and the Measurements
 % evolution
 x_0_aug=[x_0; zeros(n_selfish,1)];
-%x_k_PI = zeros(n + n_selfish , t_end+1);
 x_k_average_PI = zeros(n + n_selfish , t_end+1);
 x_k_average_PI_sat = zeros(n + n_selfish , t_end+1);
 y_k_average_PI = zeros(n_selfish , t_end+1);
-%x_k_PI(: , 1) = x_0_aug;
 x_k_average_PI(: , 1) = x_0_aug;
-x_k_average_PI_sat = x_0_aug;
+
 y_k_average_PI(: , 1) = C*x_0;
 
 % Open-Loop System
@@ -47,21 +45,19 @@ average_A_PI_np = average_A_PI-perturbation;
 
 % Building the sequernce of state matrices for PI-Controlled Closed Loop 
 for k  = 1:t_end
-    % A_PI_sequence(: , : , k) = [A_sequence(: , : , k)-B*Kp*C , B*Ki ; -C , eye(n_selfish)];
-    % x_k_PI(: , k+1) = A_PI_sequence(: , : , k) * x_k_PI(: , k) + [B*Kp ; eye(n_selfish)]*ref;
     x_k_average_PI(: , k+1) = average_A_PI * x_k_average_PI(: , k) + [B*Kp ; eye(n_selfish)]*ref;
-    x_k_average_PI_sat(1:n , k+1) = sat_function(x_k_average_PI(1:n , k+1));
-    x_k_average_PI_sat(n+1:end , k+1) = x_k_average_PI_sat(n+1:end , k) + (ref - y_k_average_PI(: , k));
+    x_k_average_PI(1:n , k+1) = sat_function(x_k_average_PI(1:n , k+1));
+    x_k_average_PI(n+1:end , k+1) = x_k_average_PI(n+1:end , k) + (ref - y_k_average_PI(: , k));
     y_k_average_PI(: , k+1) = C * x_k_average_PI(1:n , k+1);
 end
 
 %Plotting opinion Dynamics and integrated error
 figure(103) ;  hold on;
-plot(0:1:t_end , x_k_average_PI_sat(1:3 ,:) ,  'LineWidth' , 1.5); hold on;
-plot(0:1:t_end, x_k_average_PI_sat(n_selfish+1:n_selfish+3 ,:),  'LineWidth' , 1.5);
-plot(0:1:t_end, x_k_average_PI_sat(n+1:n+3 ,:),  'LineWidth' , 1.5);
-plot(0:1:t_end , y_k_average_PI(1 ,:) , 'LineWidth' , 1.5);
+plot(0:1:t_end , x_k_average_PI(1:3 ,:) ,  'LineWidth' , 1.5); hold on;
+plot(0:1:t_end, x_k_average_PI(n_selfish+1:n_selfish+3 ,:),  'LineWidth' , 1.5);
+plot(0:1:t_end, x_k_average_PI(n+1:n+3 ,:),  'LineWidth' , 1.5);
+plot(0:1:t_end , y_k_average(1 ,:) , 'LineWidth' , 1.5);
 plot(0:1:t_end, ref_seq, 'k .' , 'MarkerSize' , 0.7);
 legend( 'Coordinator 1' ,'Coordinator 2' ,'Coordinator 3' , 'Standard Agent 1' , 'Standard Agent 2' , 'Standard Agent 3' , 'Integrated Error Coordinator 1' , 'Integrated Error Coordinator 2' ,  'Integrated Error Coordinator 3' , 'Network average' , 'Reference');
-% title('Global, NO saturation, Mean reference, P');
+title('Global, saturation, Mean reference, PI');
 hold off;

@@ -208,7 +208,7 @@ end
 
 %% IMPLEMENTING THE FEEDBACK CONTROL LAW
 % number of coordinators
-n_selfish = 5;
+n_selfish = 10;
 
 % Refererence chosen to be the mean of the standard agents
 ref=mean(x_0(n_selfish+1:end))*ones(n_selfish , 1);
@@ -217,16 +217,17 @@ ref=mean(x_0(n_selfish+1:end))*ones(n_selfish , 1);
 ref_seq = mean(x_0(n_selfish+1:end)) * ones(t_end+1 , 1);
 
 %Initializing Gains
-Kp = 25*eye(n_selfish);
-Ki = 10*eye(n_selfish);
+Kp = 20*eye(n_selfish);
+Ki = 5*eye(n_selfish);
 
 %% STEP 1 P CONTROLLER
 % Assumptions:
-% - n_selfish selfish agents IOTA NODE that are P-controlled
+% - n_selfish coordinators IOTA NODES that are P-controlled
 % - Expected Averaging Matrix
 % - Global Selfish Agent,i.e. its control action is based on the whole network
 % - Underlying network is a complete graph
 % - The mean has to converge to a reference ref
+
 if complete
     [x_k_average_P , y_k_average_P , average_A_P] = P_global(n , p , t_end , x_0 , n_selfish , ref , Kp);
 end
@@ -241,7 +242,7 @@ end
 
 %% STEP 2 PI CONTROLLER
 % Assumptions:
-% - n_selfish selfish agents IOTA NODE that are PI-CONTROLLED
+% - n_selfish coordinators IOTA NODES that are PI-CONTROLLED
 % - Randomized Adjacency
 % - Global Selfish Agent,i.e. its control action is based on the whole network
 % - Underlying network is a complete graph
@@ -285,71 +286,49 @@ end
 %Same assumptions as in STEP 2, but now we introduce a saturation to the
 %selfish nodes opinion so that it can't go higher than 1 or lower than 0
 
-x_0_aug=[x_0;zeros(n_selfish,1)];
-x_k_PI = zeros(n + n_selfish , t_end+1);
-x_k_PI(: , 1) = x_0_aug;
-A_cl_sequence = zeros(n + n_selfish , n + n_selfish , t_end);
-
-for k  = 1:t_end
-    A_cl_sequence(: , : , k) = [A_sequence(: , : , k)-B*Kp*C , B*Ki ; -C , 1];
-    x_k_PI(: , k+1) = sat_function(A_cl_sequence(: , : , k) * x_k_PI(: , k) + [B*Kp ; 1]*ref);
-    x_k_average_PI(: , k+1) = sat_function(average_A_cl * x_k_average_PI(: , k) + [B*Kp ; 1]*ref);
+if complete
+    [x_k_average_PI_sat, y_k_average_PI_sat, average_A_PI , average_A_PI_np] = PI_global_saturation(n , p , t_end , x_0 , n_selfish , ref , Kp , Ki);
 end
 
-figure(6) ; 
-plot(0:1:t_end , x_k_average_PI(1:5,:) ,  'LineWidth' , 2); grid on; hold on; legend();
-plot(0:1:t_end , x_k_PI(n+1 , :) ,  'LineWidth' , 2); title('Global, Saturation ,Mean reference'); hold off;
 
-
-%% STEP 2
+%% STEP 3
 % Assumptions:
-% - One selfish agent IOTA NODE
+% - n_selfish coordinators IOTA NODES that are P-CONTROLLED
 % - Randomized Adjacency
-% - Global Selfish Agent,i.e. its control action is based on the whole network
+% - Global Selfish Agents, i.e. its control action is based on the whole network
 % - complete graph as the underlying network
 % - The mean has to converge to a reference ref
 
-%Define reference value
-ref=mean(x_0);
-
-%Define number of controlled nodes
-m = 3;
-
-% Define the closed loop system state space representation (A , B , C , D)
-B = [ones(n_selfish , 1) ; zeros(n - n_selfish , 1)];
-C = zeros(n_selfish,n);
-C(randperm(n-1,m)) = 1/m;
-Kp = 10;
-Ki = 0.01;
-
-%Initial condition for the augmented states
-x_0_aug=[x_0;zeros(n_selfish,1)];
-x_k_PI = zeros(n + n_selfish , t_end+1);
-x_k_PI(: , 1) = x_0_aug;
-
-A_cl_sequence = zeros(n + n_selfish , n + n_selfish , t_end);
-for k  = 1:t_end
-    A_cl_sequence(: , : , k) = [A_sequence(: , : , k)-B*Kp*C , B*Ki ; -C , 1];
-    x_k_PI(: , k+1) = A_cl_sequence(: , : , k) * x_k_PI(: , k) + [B*Kp ; 1]*ref;
+if complete
+    [x_k_P , y_k_P] = P_global_rand(n , p , t_end , x_0 , n_selfish , ref , A_sequence , Kp);
 end
-figure(7) ; plot(0:1:t_end , x_k_PI(1:5,:) ,  'LineWidth' , 2); grid on; hold on; legend();
-plot(0:1:t_end , x_k_PI(n+1 , :) ,  'LineWidth' , 2);title('Myopic, NO saturation, Mean reference'); hold off;
 
-%% STEP 2.1
-% Same as 2 but with saturation on the selfish node
+%% STEP 3.1
+% Same as 3 but with saturation on the opinions
 
-%Initial condition for the augmented states
-x_0_aug=[x_0;zeros(n_selfish,1)];
-x_k_PI = zeros(n + n_selfish , t_end+1);
-x_k_PI(: , 1) = x_0_aug;
-
-A_cl_sequence = zeros(n + n_selfish , n + n_selfish , t_end);
-for k  = 1:t_end
-    A_cl_sequence(: , : , k) = [A_sequence(: , : , k)-B*Kp*C , B*Ki ; -C , 1];
-    x_k_PI(: , k+1) = sat_function(A_cl_sequence(: , : , k) * x_k_PI(: , k) + [B*Kp ; 1]*ref);
+if complete
+    [x_k_P_sat , y_k_P_sat] = P_global_rand_sat(n , p , t_end , x_0 , n_selfish , ref , A_sequence , Kp);
 end
-figure(8); plot(0:1:t_end , x_k_PI(1:5,:) ,  'LineWidth' , 2); grid on; hold on; legend();
-plot(0:1:t_end , x_k_PI(n+1 , :) ,  'LineWidth' , 2); title('Myopic, Saturation, Mean reference') ;hold off;
+
+%% STEP 4
+% Assumptions:
+% - n_selfish coordinators IOTA NODES that are PI-CONTROLLED
+% - Randomized Adjacency used now instead of E{A}
+% - Global Selfish Agents, i.e. its control action is based on the whole network
+% - complete graph as the underlying network
+% - The mean has to converge to a reference ref
+
+if complete
+    [x_k_PI , y_k_PI] = PI_global_rand(n , p , t_end , x_0 , n_selfish , ref , A_sequence , Kp , Ki);
+end
+
+%% STEP 4.1
+% Same as 4 but with saturation on the opinions
+
+if complete
+    [x_k_PI_sat , y_k_PI_sat] = PI_global_rand_sat(n , p , t_end , x_0 , n_selfish , ref , A_sequence , Kp , Ki);
+end
+
 %% STEP 3
 % Assumptions:
 % - One selfish agent IOTA NODE
