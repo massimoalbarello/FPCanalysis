@@ -385,28 +385,3 @@ if complete
     [x_k_PI_sat , y_k_PI_sat] = PI_global_rand_sat(n , p , t_end , x_0 , n_selfish , ref , A_sequence , Kp , Ki);
 end
 
-%% STEP 3
-% Assumptions:
-% - One selfish agent IOTA NODE
-% - Randomized Adjacency
-% - Myopic Selfish Agent C not strictly positive C = [c_1 , ... , c_n] only
-%   m c_i's are non-zero, with m<n
-% - complete graph as the underlying network
-% - The error wrt the other nodes has to converge to a reference ref = 0
-
-% Define the closed loop system state space representation (A , B , C , D)
-B = [ones(n_selfish , 1) ; zeros(n - n_selfish , 1)];
-C = [n-n_selfish , - ones(1 , n-n_selfish)];
-Kp = 0.01;
-Ki = 0.001;
-
-% Defining new reference
-ref = 0.001;
-
-A_cl_sequence = zeros(n + n_selfish , n + n_selfish , t_end);
-for k  = 1:t_end
-    A_cl_sequence(: , : , k) = [A_sequence(: , : , k)-B*Kp*C , B*Ki ; -C , 1];
-    x_k_PI(: , k+1) = A_cl_sequence(: , : , k) * x_k_PI(: , k) + [B*Kp ; 1]*ref;
-end
-figure(9) ; plot(0:1:t_end , x_k_PI(:,:) ,  'LineWidth' , 2); grid on; hold on; legend();
-plot(0:1:t_end , x_k_PI(n+1 , :) ,  'LineWidth' , 2);title('Global, "Laplacian" reference'); hold off;

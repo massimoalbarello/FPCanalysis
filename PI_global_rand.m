@@ -34,7 +34,7 @@ for k  = 1:t_end
 end
 
 %Plotting opinion Dynamics
-figure(106) ;  hold on;
+figure(1000) ;  hold on;
 plot(0:1:t_end , x_k_PI(1:3 ,:) ,  'LineWidth' , 1.5); hold on;
 plot(0:1:t_end, x_k_PI(n_selfish+1 ,:),  'LineWidth' , 1.5);
 plot(0:1:t_end, x_k_PI(n+1 ,:),  'LineWidth' , 1.5);
