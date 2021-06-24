@@ -41,7 +41,7 @@ plot(0:1:t_end, x_k_average_P(n_selfish+1 ,:),  'LineWidth' , 1.5);
 plot(0:1:t_end , y_k_average_P(1 ,:) , 'LineWidth' , 1.5);
 plot(0:1:t_end, ref_seq, 'k .' , 'MarkerSize' , 1.2);
 legend( 'Coordinator 1' ,'Coordinator 2' ,'Coordinator 3' , 'Standard Agent 1' , 'Network average' , 'Reference'  ,'Location' ,'SouthEast');
-% title('Global, NO saturation, Mean reference, P');
+title('Global, NO saturation, Mean reference, P');
 hold off;
 
 end
