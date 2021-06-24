@@ -237,7 +237,7 @@ end
 %opinion so that it can't go higher than 1 or lower than 0
 
 if complete
-    [x_k_average_P_sat, y_k_average_P_sat, average_A_P] = P_global_saturation(n , p , t_end , x_0 , n_selfish , ref , Kp)
+    [x_k_average_P_sat, y_k_average_P_sat, average_A_P] = P_global_saturation(n , p , t_end , x_0 , n_selfish , ref , Kp);
 end
 
 %% STEP 2 PI CONTROLLER
