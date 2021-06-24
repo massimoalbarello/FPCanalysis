@@ -24,14 +24,14 @@ C = (1/n)*[ones(n_selfish , n)];
 x_0_aug=[x_0; zeros(n_selfish,1)];
 x_k_PI = zeros(n + n_selfish , t_end+1);
 y_k_PI = zeros(n_selfish , t_end+1);
-x_k_PI(: , 1) = x_0_aug;
+x_k_PI(1:n , 1) = sat_function(x_0_aug(1:n , 1));
 y_k_PI(: , 1) = C*x_0;
 
 % Building the sequence of state matrices for PI-Controlled Closed Loop 
 for k  = 1:t_end
     A_PI_sequence(: , : , k) = [A_sequence(: , : , k)-B*Kp*C , B*Ki ; -C , eye(n_selfish)];
-    x_k_PI(: , k+1) = A_PI_sequence(: , : , k) * x_k_PI(: , k) + [B*Kp ; eye(n_selfish)]*ref;
-    x_k_PI(1:n , k+1) = sat_function(x_k_PI(1:n , k+1));
+    x_k_PI(1:n , k+1) = sat_function( A_PI_sequence(1:n , : , k) * x_k_PI(: , k) + B*Kp*ref );
+    x_k_PI(n+1:end , k+1) = -C * x_k_PI(1:n , k) + eye(n_selfish)*x_k_PI(n+1:end , k);
     y_k_PI(: , k+1) = C * x_k_PI(1:n , k+1);
 end
 
@@ -39,7 +39,7 @@ end
 figure(107) ;  hold on;
 plot(0:1:t_end , x_k_PI(1:3 ,:) ,  'LineWidth' , 1.5); hold on;
 plot(0:1:t_end, x_k_PI(n_selfish+1 ,:),  'LineWidth' , 1.5);
-plot(0:1:t_end, x_k_PI(n+1 ,:),  'LineWidth' , 1.5);
+% plot(0:1:t_end, x_k_PI(n+1 ,:),  'LineWidth' , 1.5);
 plot(0:1:t_end , y_k_PI(1 ,:) , 'LineWidth' , 1.5);
 plot(0:1:t_end, ref_seq, 'k .' , 'MarkerSize' , 1.1);
 legend( 'Coordinator 1' ,'Coordinator 2' ,'Coordinator 3' , 'Standard Agent 1' , 'Integrated Error Coordinator 1' , 'Network average' , 'Reference');

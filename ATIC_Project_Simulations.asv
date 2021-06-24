@@ -4,7 +4,7 @@ n = 100;
 % Defining the number of nodes to be sampled
 p = 5;
 %Fix simulation length
-t_end = 25;       
+t_end = 30;       
 %plotting variable
 plotting = false;
 plotting_eig = false;
@@ -211,7 +211,7 @@ end
 
 %% IMPLEMENTING THE FEEDBACK CONTROL LAW
 % number of coordinators
-n_selfish = 5;
+n_selfish = 10;
 
 % Refererence chosen to be the mean of the standard agents
 ref=mean(x_0(n_selfish+1:end))*ones(n_selfish , 1);
@@ -220,8 +220,8 @@ ref=mean(x_0(n_selfish+1:end))*ones(n_selfish , 1);
 ref_seq = mean(x_0(n_selfish+1:end)) * ones(t_end+1 , 1);
 
 %Initializing Gains
-Kp = 0.01*eye(n_selfish);
-Ki = 0.001*eye(n_selfish);
+Kp = 15*eye(n_selfish);
+Ki = 5*eye(n_selfish);
 
 %% STEP 1 P CONTROLLER
 % Assumptions:
@@ -302,9 +302,9 @@ end
 % - complete graph as the underlying network
 % - The mean has to converge to a reference ref
 
-
-[x_k_P , y_k_P , C] = P_rand(n , p , t_end , x_0 , n_selfish , ref , A_sequence , topology, complete, Kp);
-
+if complete
+    [x_k_P , y_k_P] = P_global_rand(n , p , t_end , x_0 , n_selfish , ref , A_sequence , Kp);
+end
 
 %% STEP 3.1
 % Same as 3 but with saturation on the opinions

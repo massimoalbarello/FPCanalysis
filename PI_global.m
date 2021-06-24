@@ -27,7 +27,7 @@ y_k_average_PI = zeros(n_selfish , t_end+1);
 %x_k_PI(: , 1) = x_0_aug;
 x_k_average_PI(: , 1) = x_0_aug;
 y_k_average_PI(: , 1) = C*x_0;
-
+ 
 % Open-Loop System
 average_A_PI = [average_A-B*Kp*C , B*Ki ; -C , eye(n_selfish)];
 perturbation = [zeros(n_selfish , n) , Ki ; zeros(n , n+n_selfish)];
