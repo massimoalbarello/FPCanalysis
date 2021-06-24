@@ -1,4 +1,4 @@
-function [x_k_average_P, y_k_average_P, average_A_P] = P_global_saturation(n , p , t_end , x_0 , n_selfish , ref , Kp)
+function [x_k_average_P, y_k_average_P, average_A_P] = P_rand_sat(n , p , t_end , x_0 , n_selfish , ref , Kp)
 
 %Function giving the following output of a P-controlled system with global
 %visibility:

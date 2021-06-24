@@ -1,4 +1,4 @@
-function [x_k_P , y_k_P , C] = P_rand(n , p , t_end , x_0 , n_selfish , ref , A_sequence, topology , complete, Kp)
+function [x_k_P , y_k_P] = P_rand(n , p , t_end , x_0 , n_selfish , ref , A_sequence, topology , complete, Kp)
 
 %Function giving the following output of a P-controlled system with global
 %visibility, using the random sequence of i.i.d. matrices
