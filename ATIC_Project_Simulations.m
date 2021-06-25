@@ -11,7 +11,7 @@ plotting_eig = false;
 lap = false;
 complete = false;
 not_complete = true;
-first = true;
+first = false;
 
 % Defining the initial conditions on the opinions
 x_0 = zeros(n , 1);
@@ -93,15 +93,15 @@ elseif not_complete
             end
 
 
-            if ((Summation==0) & (Irreducibility == 1))
+            if ((Summation==0) && (Irreducibility == 1))
                 fprintf('Need more neighbours, Irreducible\n');
-            elseif ((Summation==1) & (Irreducibility == 1))
+            elseif ((Summation==1) && (Irreducibility == 1))
                 fprintf('Enough neighbours, Irreducible\n');
                 topology = topology;
                 bad_topology = false;
-            elseif ((Summation==0) & (Irreducibility == 0))
+            elseif ((Summation==0) && (Irreducibility == 0))
                 fprintf('Need more neighbours, Not Irreducible\n');
-            elseif ((Summation==1) & (Irreducibility == 0))
+            elseif ((Summation==1) && (Irreducibility == 0))
                 fprintf('Enough neighbours, Not Irreducible\n');
             else
                  fprintf('I forgot one case\n');
@@ -228,7 +228,7 @@ if complete
 end
  
 
-if not_complete & first
+if not_complete && first
     mask_sequence_stubborn = zeros(n + n_stubborn , n+n_stubborn , t_end);
     A_sequence_stubborn = zeros(n + n_stubborn , n + n_stubborn , t_end);
     for k = 1:t_end
