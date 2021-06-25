@@ -4,13 +4,14 @@ n = 100;
 % Defining the number of nodes to be sampled
 p = 5;
 %Fix simulation length
-t_end = 25;       
+t_end = 5000;       
 %plotting variable
 plotting = false;
 plotting_eig = false;
 lap = false;
 complete = false;
 not_complete = true;
+first = false;
 
 % Defining the initial conditions on the opinions
 x_0 = zeros(n , 1);
@@ -175,48 +176,6 @@ if plotting_eig
 end
 
 
-%% ATTEMPT ON LAPLACIAN SEQUENCE
-if lap
-    % Computing the Laplacian matrix associated to the sequence of A(k)
-    L_sequence = zeros(n , n , t_end);
-    for i = 1:t_end
-        L_sequence(: , : , i) = eye(n) - A_sequence(: , : , i);
-    end
-    average_L = eye(n) - average_A;
-
-    %Plotting the evolution using the sequence of laplacian matrices
-    step = 0.01;
-    counter = 1;
-    t_span = 0:step:t_end;
-    x_t = zeros(n , length(t_span));
-    x_t(: , 1) = x_0;
-    x_init = x_0;
-    for i = 1:t_end
-        for k = 1:(1/step)
-            x_t(: , (1/step)*(i - 1)+ k + 1) = expm(-L_sequence(: , : , i)*t_span(k))*x_init;
-        end
-        x_init = x_t(: , 100*(i - 1)+ k + 1);
-    end
-
-    if(plotting == true)
-        figure(3); plot(t_span , x_t( : ,:), 'LineWidth' , 1.1); hold on; grid on;
-        % plot(0:1:t_end , x_k(1:2 ,:), 'LineWidth' , 1.3)
-    end
-
-    %Computing the solution for the continuous time system (Expected L)
-    x_t_expected = zeros(n , length(t_span));
-    for k = 1:length(t_span)
-        x_t_expected(: , k) = expm(-average_L*t_span(k))*x_0;
-    end
-
-
-    %Plotting the state evolution in continuous time (for expected L)
-    if(plotting == true)
-        figure(4); plot(t_span , x_t_expected, 'LineWidth' , 2); grid on;
-    end
-end
-
-
 %% IMPLEMENTING THE FEEDBACK CONTROL LAW
 % number of coordinators
 n_selfish = 5;
@@ -228,16 +187,26 @@ ref=mean(x_0(n_selfish+1:end))*ones(n_selfish , 1);
 ref_seq = mean(x_0(n_selfish+1:end)) * ones(t_end+1 , 1);
 
 %Initializing Gains
-Kp = 3*eye(n_selfish);
-Ki = 1*eye(n_selfish);
+Kp =5*eye(n_selfish);
+Ki = 0.01*eye(n_selfish);
 
 %% DEFINING A TOPOLOGY THAT ALSO HAS A SINGLE MALICIOUS NODE (STUBBORN NODE). THE NETWORK WILL NOW HAVE N+1 NODES
 n_stubborn = 1;
 n_tot = n+n_stubborn;
 topology_stubborn = zeros(n_tot , n_tot);
-new_connections = randi([0 1], n-n_selfish ,n_stubborn);
-topology_stubborn = [topology(1:n_selfish , :), zeros(n_selfish , n_stubborn); topology(n_selfish+1:end , :) , new_connections ; zeros(n_stubborn , n), ones(n_stubborn)];
+if first
+    new_connections = zeros( n-n_selfish ,n_stubborn);
+    for i = 1:length(new_connections)
+        new_connections( i , 1 ) = rand(1);
+        if  new_connections(i , 1) > 0.9
+            new_connections(i , 1) = 1;
+        else
+            new_connections(i , 1) = 0;
+        end
+    end
 
+topology_stubborn = [topology(1:n_selfish , :), zeros(n_selfish , n_stubborn); topology(n_selfish+1:end , :) , new_connections ; zeros(n_stubborn , n), ones(n_stubborn)];
+end
 % Vector of initial conditions with stubborn agents
 x_0_stubborn = zeros(n_tot , 1);
 x_0_stubborn(1:n) = x_0;
@@ -255,8 +224,9 @@ if complete
     A_sequence_stubborn(1:n , : , :) = (1/(p+1))*mask_sequence_stubborn(1:n , : , :);
     A_sequence_stubborn(n+1:end , : , :) = (1/(n_stubborn))*mask_sequence_stubborn(n+1:end , : , :);
 end
+ 
 
-if not_complete
+if not_complete & first
     mask_sequence_stubborn = zeros(n + n_stubborn , n+n_stubborn , t_end);
     A_sequence_stubborn = zeros(n + n_stubborn , n + n_stubborn , t_end);
     for k = 1:t_end
@@ -344,24 +314,22 @@ end
 % Assumptions:
 % - n_selfish coordinators IOTA NODES that are P-CONTROLLED
 % - Randomized Adjacency
-% - Global Selfish Agents, i.e. its control action is based on the whole network
-% - complete graph as the underlying network
+% - Myopic Selfish Agents, i.e. limited visibility of the net
+% - connected graph as the underlying network
 % - The mean has to converge to a reference ref
 
 [x_k_P , y_k_P ] = P_rand(n , p , t_end , x_0 , n_selfish , ref , A_sequence , topology, complete, Kp);
 
 %% STEP 3.1
-%Same assumptions as in STEP 1.1, but now we introduce a stubborn agent
+%Same assumptions as in STEP 3, but now we introduce a stubborn agent
 
- sum_rows = diag(sum(topology_stubborn , 2))
- C = (inv(sum_rows) * topology_stubborn)
- C = C(1:n_selfish , :)
- CACCA = C*x_0_stubborn
 [x_k_P_stubborn , y_k_P_stubborn] = P_rand_stubborn(n , p , t_end , x_0_stubborn , n_selfish , n_stubborn, ref , A_sequence_stubborn , topology_stubborn, complete, Kp);
     
 
 %% STEP 3.2
 % Same as 3 but with saturation on the opinions
+
+%----SKIP----
 
 [x_k_P_sat , y_k_P_sat] = P_rand_sat(n , p , t_end , x_0 , n_selfish , ref , A_sequence , topology, complete, Kp);
 
@@ -376,16 +344,28 @@ end
 % Assumptions:
 % - n_selfish coordinators IOTA NODES that are PI-CONTROLLED
 % - Randomized Adjacency used now instead of E{A}
-% - Global Selfish Agents, i.e. its control action is based on the whole network
-% - complete graph as the underlying network
+% - Myopic Selfish Agents, i.e. its control action is based on the whole network
+% - connected graph as the underlying network
 % - The mean has to converge to a reference ref
 
-[x_k_PI , y_k_PI] = PI_global_rand(n , p , t_end , x_0 , n_selfish , ref , A_sequence , Kp , Ki);
+%---PI con più coordinator: la nostra conjecture (caso myopic, NO stubborn)
+[x_k_PI_ns , y_k_PI] = PI_myopic_rand(n , p , t_end , x_0 , n_selfish , ref , A_sequence , Kp , Ki);
 
 %% STEP 4.1
-% Same as 4 but with saturation on the opinions
+% Assumptions:
+% - n_selfish = 1 coordinators IOTA NODES that are PI-CONTROLLED
+% - Randomized Adjacency used now instead of E{A}
+% - Myopic Selfish Agents, i.e. its control action is based on the whole network
+% - connected graph as the underlying network
+% - The mean has to converge to a reference ref
+% - One stubborn agent
 
-if complete
-    [x_k_PI_sat , y_k_PI_sat] = PI_global_rand_sat(n , p , t_end , x_0 , n_selfish , ref , A_sequence , Kp , Ki);
-end
+%PI con un coordinator e uno stubborn
+[x_k_PI , y_k_PI] = PI_myopic_rand_stub(n , p , t_end , x_0 , n_selfish , ref , A_sequence , Kp , Ki);
 
+
+%% STEP 4.2
+% Same as 4.1 but with saturation
+
+
+[x_k_PI , y_k_PI] = PI_myopic_rand_stub_sat(n , p , t_end , x_0 , n_selfish , ref , A_sequence , Kp , Ki);
