@@ -11,7 +11,7 @@ plotting_eig = false;
 lap = false;
 complete = false;
 not_complete = true;
-first = false;
+first = true;
 
 % Defining the initial conditions on the opinions
 x_0 = zeros(n , 1);
@@ -350,16 +350,10 @@ end
 % - connected graph as the underlying network
 % - The mean has to converge to a reference ref
 
-
-
 [x_k_PI , y_k_PI] = PI_rand(n , p , t_end , x_0 , n_selfish , ref , A_sequence , topology , complete , Kp , Ki);
 
 % %---PI con più coordinator: la nostra conjecture (caso myopic, NO stubborn)
 % [x_k_PI , y_k_PI] = PI_rand(n , p , t_end , x_0 , n_selfish , ref , A_sequence , Kp , Ki);
-
-
-%---PI con più coordinator: la nostra conjecture (caso myopic, NO stubborn)
-%[x_k_PI , y_k_PI] = PI_rand(n , p , t_end , x_0 , n_selfish , ref , A_sequence , Kp , Ki);
 
 %% STEP 4.1
 % Assumptions:
@@ -371,14 +365,12 @@ end
 % - One stubborn agent
 
 %PI con un coordinator e uno stubborn
-%[x_k_PI_stub , y_k_PI_stub] = PI_rand_stub(n , p , t_end , x_0 , n_selfish , ref , A_sequence , Kp , Ki);
+[x_k_PI_stub , y_k_PI_stub] = PI_rand_stubborn(n , p , t_end , x_0_stubborn , n_selfish , n_stubborn, ref , A_sequence_stubborn , topology_stubborn , complete , Kp , Ki);
 
 
 %% STEP 4.2
 % Same as 4.1 but with saturation
-
-
-%[x_k_PI_stub_sat , y_k_PI_stub_sat] = PI_rand_stub_sat(n , p , t_end , x_0 , n_selfish , ref , A_sequence , Kp , Ki);
+[x_k_PI_stub_sat , y_k_PI_stub_sat] = PI_rand_sat_stubborn(n , p , t_end , x_0_stubborn , n_selfish , n_stubborn, ref , A_sequence_stubborn , topology_stubborn , complete , Kp , Ki);
 
 %% STEP 5
 %Assigning coordinators according to centrality measures
