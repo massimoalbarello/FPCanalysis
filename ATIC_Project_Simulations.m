@@ -48,7 +48,6 @@ if complete
     
 %     [pagerank,indices] = maxk(centrality(average_G,'pagerank'),n_selfish);
     
-    
 
     %Check row stochasticity of A (satisfied)
     row_sums = sum(average_A,2);
@@ -126,7 +125,11 @@ average_G = digraph(average_A);
 % Checking if the expected value is row stochastic;
 row_stochastic = sum(average_A , 2);
 
+
 end
+
+
+
 
 %% EVOLUTION OF THE STATE
     %State evolution of the dicrete time system (Randomized)
@@ -174,6 +177,8 @@ if plotting_eig
     hold off;
 end
 
+
+%% ATTEMPT ON LAPLACIAN SEQUENCE
 if lap
     % Computing the Laplacian matrix associated to the sequence of A(k)
     L_sequence = zeros(n , n , t_end);
@@ -226,8 +231,44 @@ ref=mean(x_0(n_selfish+1:end))*ones(n_selfish , 1);
 ref_seq = mean(x_0(n_selfish+1:end)) * ones(t_end+1 , 1);
 
 %Initializing Gains
-Kp = 0.01*eye(n_selfish);
-Ki = 0.001*eye(n_selfish);
+Kp = 3*eye(n_selfish);
+Ki = 1*eye(n_selfish);
+
+%% DEFINING A TOPOLOGY THAT ALSO HAS A SINGLE MALICIOUS NODE (STUBBORN NODE). THE NETWORK WILL NOW HAVE N+1 NODES
+n_stubborn = 1;
+n_tot = n+n_stubborn;
+topology_stubborn = zeros(n_tot , n_tot);
+new_connections = randi([0 1], n-n_selfish ,n_stubborn);
+topology_stubborn = [topology(1:n_selfish , :), zeros(n_selfish , n_stubborn); topology(n_selfish+1:end , :) , new_connections ; zeros(n_stubborn , n), ones(n_stubborn)];
+
+% Vector of initial conditions with stubborn agents
+x_0_stubborn = zeros(n_tot , 1);
+x_0_stubborn(1:n) = x_0;
+% We want the malicious nodes to have an opinion that is the opposite of
+% the majority of the network, thus they will all have opinion x = 0 and
+% will never change it
+x_0_stubborn(n+1:end , 1) = zeros(n_stubborn , 1);
+
+if complete
+    mask_sequence_stubborn = zeros(n + n_stubborn , n+n_stubborn , t_end);
+    A_sequence_stubborn = zeros(n + n_stubborn , n+n_stubborn , t_end);
+    for k = 1:t_end
+        [mask_sequence_stubborn( : , : , k ) , average_mask_stubborn] = mask_samples_arbitrary_net_stubborn(topology , n , n_stubborn , p);
+    end
+    A_sequence_stubborn(1:n , : , :) = (1/(p+1))*mask_sequence_stubborn(1:n , : , :);
+    A_sequence_stubborn(n+1:end , : , :) = (1/(n_stubborn))*mask_sequence_stubborn(n+1:end , : , :);
+end
+
+if not_complete
+    mask_sequence_stubborn = zeros(n + n_stubborn , n+n_stubborn , t_end);
+    A_sequence_stubborn = zeros(n + n_stubborn , n + n_stubborn , t_end);
+    for k = 1:t_end
+        [mask_sequence_stubborn( : , : , k ) , average_mask_stubborn] = mask_samples_arbitrary_net_stubborn(topology_stubborn , n , n_stubborn , p);
+    end
+    A_sequence_stubborn(1:n , : , :) = (1/(p+1))*mask_sequence_stubborn(1:n , : , :);
+    A_sequence_stubborn(n+1:end , : , :) = (1/(n_stubborn))*mask_sequence_stubborn(n+1:end , : , :);
+end
+
 
 %% STEP 1 P CONTROLLER
 % Assumptions:
@@ -242,12 +283,14 @@ if complete
 end
 
 %% STEP 1.1
-%Same assumptions as in STEP 1, but now we introduce a saturation to the selfish node
+%Same assumptions as in STEP 1, but now we introduce a saturation to the
 %opinion so that it can't go higher than 1 or lower than 0
 
 if complete
-    [x_k_average_P_sat, y_k_average_P_sat, average_A_P] = P_global_saturation(n , p , t_end , x_0 , n_selfish , ref , Kp);
+    [x_k_average_P_sat, y_k_average_P_sat] = P_global_saturation(n , p , t_end , x_0 , n_selfish , ref , Kp);
 end
+
+
 
 %% STEP 2 PI CONTROLLER
 % Assumptions:
@@ -304,20 +347,29 @@ end
 % Assumptions:
 % - n_selfish coordinators IOTA NODES that are P-CONTROLLED
 % - Randomized Adjacency
-% - Global Selfish Agents, i.e. its control action is based on the whole network
-% - complete graph as the underlying network
+% - Myopic Selfish Agents, i.e. limited visibility of the net
+% - connected graph as the underlying network
 % - The mean has to converge to a reference ref
 
-
-[x_k_P , y_k_P] = P_rand(n , p , t_end , x_0 , n_selfish , ref , A_sequence , topology, complete, Kp);
-
+[x_k_P , y_k_P ] = P_rand(n , p , t_end , x_0 , n_selfish , ref , A_sequence , topology, complete, Kp);
 
 %% STEP 3.1
+%Same assumptions as in STEP 3, but now we introduce a stubborn agent
+
+[x_k_P_stubborn , y_k_P_stubborn] = P_rand_stubborn(n , p , t_end , x_0_stubborn , n_selfish , n_stubborn, ref , A_sequence_stubborn , topology_stubborn, complete, Kp);
+    
+
+%% STEP 3.2
 % Same as 3 but with saturation on the opinions
 
-if complete
-    [x_k_P_sat , y_k_P_sat] = P_global_rand_sat(n , p , t_end , x_0 , n_selfish , ref , A_sequence , Kp);
-end
+[x_k_P_sat , y_k_P_sat] = P_rand_sat(n , p , t_end , x_0 , n_selfish , ref , A_sequence , topology, complete, Kp);
+
+
+%% STEP 3.3
+% Same as STEP 3.2 but with stubborn agent disturbance
+
+[x_k_P_sat_stubborn , y_k_P_sat_stubborn] = P_rand_sat_stubborn(n , p , t_end , x_0_stubborn , n_selfish , n_stubborn, ref , A_sequence_stubborn , topology_stubborn, complete, Kp);
+
 
 %% STEP 4
 % Assumptions:
@@ -330,6 +382,7 @@ end
 
 [x_k_PI , y_k_PI] = PI_rand(n , p , t_end , x_0 , n_selfish , ref , A_sequence , topology , complete , Kp , Ki);
 
+
 %% STEP 4.1
 % Same as 4 but with saturation on the opinions
 
@@ -337,28 +390,3 @@ if complete
     [x_k_PI_sat , y_k_PI_sat] = PI_global_rand_sat(n , p , t_end , x_0 , n_selfish , ref , A_sequence , Kp , Ki);
 end
 
-%% STEP 3
-% Assumptions:
-% - One selfish agent IOTA NODE
-% - Randomized Adjacency
-% - Myopic Selfish Agent C not strictly positive C = [c_1 , ... , c_n] only
-%   m c_i's are non-zero, with m<n
-% - complete graph as the underlying network
-% - The error wrt the other nodes has to converge to a reference ref = 0
-
-% Define the closed loop system state space representation (A , B , C , D)
-B = [ones(n_selfish , 1) ; zeros(n - n_selfish , 1)];
-C = [n-n_selfish , - ones(1 , n-n_selfish)];
-Kp = 0.01;
-Ki = 0.001;
-
-% Defining new reference
-ref = 0.001;
-
-A_cl_sequence = zeros(n + n_selfish , n + n_selfish , t_end);
-for k  = 1:t_end
-    A_cl_sequence(: , : , k) = [A_sequence(: , : , k)-B*Kp*C , B*Ki ; -C , 1];
-    x_k_PI(: , k+1) = A_cl_sequence(: , : , k) * x_k_PI(: , k) + [B*Kp ; 1]*ref;
-end
-figure(9) ; plot(0:1:t_end , x_k_PI(:,:) ,  'LineWidth' , 2); grid on; hold on; legend();
-plot(0:1:t_end , x_k_PI(n+1 , :) ,  'LineWidth' , 2);title('Global, "Laplacian" reference'); hold off;
