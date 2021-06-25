@@ -1,4 +1,4 @@
-function [x_k_PI , y_k_PI] = PI_global_rand(n , p , t_end , x_0 , n_selfish , ref , A_sequence , Kp , Ki)
+function [x_k_PI , y_k_PI] = PI_rand(n , p , t_end , x_0 , n_selfish , ref , A_sequence , topology , complete , Kp , Ki)
 
 % We are checking if the controller works when using the random sequence of
 % i.i.d. matrices intead of their expected value, still with global
@@ -16,7 +16,13 @@ ref_seq = mean(x_0(n_selfish+1:end)) * ones(t_end+1 , 1);
 % State-Space Representation 
 A_PI_sequence = zeros(n+n_selfish , n+n_selfish , t_end);
 B = [eye(n_selfish) ; zeros(n - n_selfish , n_selfish)];
-C = (1/n)*[ones(n_selfish , n)];
+if complete
+    C = (1/n)*[ones(n_selfish , n)];
+else
+    sum_rows = diag(sum(topology , 2));
+    C = (inv(sum_rows) * topology);
+    C = C(1:n_selfish , :);
+end
 
 % Definition of variables for storage of the augmented state evolution and the Measurements
 % evolution
@@ -41,7 +47,7 @@ plot(0:1:t_end, x_k_PI(n+1 ,:),  'LineWidth' , 1.5);
 plot(0:1:t_end , y_k_PI(1 ,:) , 'LineWidth' , 1.5);
 plot(0:1:t_end, ref_seq, 'k .' , 'MarkerSize' , 1.1);
 legend( 'Coordinator 1' ,'Coordinator 2' ,'Coordinator 3' , 'Standard Agent 1' , 'Integrated Error Coordinator 1' , 'Network average' , 'Reference');
-title('Global, NO saturation, Mean reference, PI , random sequence');
+%title('Global, NO saturation, Mean reference, PI , random sequence');
 hold off;
 
 

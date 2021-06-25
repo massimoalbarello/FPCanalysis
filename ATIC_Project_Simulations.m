@@ -44,6 +44,11 @@ if complete
     % distribution
     average_mask = p/(n-1)*(ones(n)-eye(n))+eye(n);
     average_A = average_mask * (1/(p+1));
+    average_G = digraph(average_A);
+    
+%     [pagerank,indices] = maxk(centrality(average_G,'pagerank'),n_selfish);
+    
+    
 
     %Check row stochasticity of A (satisfied)
     row_sums = sum(average_A,2);
@@ -116,6 +121,7 @@ end
 
 A_sequence = (1/(p+1))*mask_sequence;
 average_A = (1/(p+1))*average_mask;
+average_G = digraph(average_A);
 
 % Checking if the expected value is row stochastic;
 row_stochastic = sum(average_A , 2);
@@ -303,7 +309,7 @@ end
 % - The mean has to converge to a reference ref
 
 
-[x_k_P , y_k_P , C] = P_rand(n , p , t_end , x_0 , n_selfish , ref , A_sequence , topology, complete, Kp);
+[x_k_P , y_k_P] = P_rand(n , p , t_end , x_0 , n_selfish , ref , A_sequence , topology, complete, Kp);
 
 
 %% STEP 3.1
@@ -321,9 +327,8 @@ end
 % - complete graph as the underlying network
 % - The mean has to converge to a reference ref
 
-if complete
-    [x_k_PI , y_k_PI] = PI_global_rand(n , p , t_end , x_0 , n_selfish , ref , A_sequence , Kp , Ki);
-end
+
+[x_k_PI , y_k_PI] = PI_rand(n , p , t_end , x_0 , n_selfish , ref , A_sequence , topology , complete , Kp , Ki);
 
 %% STEP 4.1
 % Same as 4 but with saturation on the opinions

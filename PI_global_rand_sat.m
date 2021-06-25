@@ -1,4 +1,4 @@
-function [x_k_PI , y_k_PI] = PI_global_rand_sat(n , p , t_end , x_0 , n_selfish , ref , A_sequence , Kp , Ki);
+function [x_k_PI , y_k_PI] = PI_global_rand_sat(n , p , t_end , x_0 , n_selfish , ref , A_sequence , topology , complete, Kp , Ki);
 
 
 % We are checking if the controller works when using the random sequence of
