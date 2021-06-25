@@ -1,6 +1,5 @@
 function [x_k_P , y_k_P ] = P_rand_stubborn(n , p , t_end , x_0_stubborn, n_selfish , n_stubborn, ref , A_sequence, topology_stubborn, complete, Kp);
 
-
 %Function giving the following output of a P-controlled system with global or myopic
 %visibility, using the random sequence of i.i.d. matrices
 % - plot of opinion dynamics in the P-controlled system
@@ -48,7 +47,7 @@ plot(0:1:t_end, x_k_P(n+1:end ,:),  'LineWidth' , 1.5);
 plot(0:1:t_end , y_k_P(1 ,:) , 'LineWidth' , 1.5);
 plot(0:1:t_end, ref_seq, 'k -.' , 'MarkerSize' , 1.1);
 legend( 'Coordinator 1' ,'Coordinator 2' ,'Coordinator 3' , 'Standard Agent 1' , 'Malicious Agent' ,'Network average' , 'Reference' , 'Location' , 'SouthEast');
-title('No saturation, stubborn agent, Mean reference, P , random sequence');
+% title('No saturation, stubborn agent, Mean reference, P , random sequence');
 hold off;
 
 end

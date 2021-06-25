@@ -45,7 +45,5 @@ legend( 'Coordinator 1' ,'Coordinator 2' ,'Coordinator 3' , 'Standard Agent 1' ,
 % title('Global, saturation, Mean reference, P , random sequence');
 hold off;
 
-
-
 end
 
