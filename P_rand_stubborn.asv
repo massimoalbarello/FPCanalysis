@@ -1,4 +1,4 @@
-function [x_k_P , y_k_P ] = P_rand_stubborn(n , p , t_end , x_0_stubborn, n_selfish , n_stubborn, ref , A_sequence, topology_stubborn, complete, Kp);
+function [x_k_P , y_k_P , C] = P_rand_stubborn(n , p , t_end , x_0_stubborn, n_selfish , n_stubborn, ref , A_sequence, topology_stubborn, complete, Kp);
 
 
 %Function giving the following output of a P-controlled system with global or myopic
@@ -8,15 +8,13 @@ function [x_k_P , y_k_P ] = P_rand_stubborn(n , p , t_end , x_0_stubborn, n_self
 % - stubborn agents (= malicious nodes)
 % - network average evolution
 
-y_k_P = zeros(n_selfish , t_end+1);
-
 % Reference sequence (for plots)
 ref_seq = mean(x_0_stubborn(n_selfish+1:end)) * ones(t_end+1 , 1);
 
 % State-Space Representation 
 A_P_sequence = zeros(n+n_stubborn , n+n_stubborn , t_end);
 B = [eye(n_selfish) ; zeros(n - n_selfish + n_stubborn , n_selfish)];
-C= zeros(n_selfish , length(x_0_stubborn));
+C= zeros(n_selfish , n+n_stubborn);
 
 if complete
     C = (1/n)*[ones(n_selfish , n + n_stubborn)];

@@ -344,15 +344,19 @@ end
 % Assumptions:
 % - n_selfish coordinators IOTA NODES that are P-CONTROLLED
 % - Randomized Adjacency
-% - Myopic Selfish Agents, i.e. limited visibility of the net
-% - connected graph as the underlying network
+% - Global Selfish Agents, i.e. its control action is based on the whole network
+% - complete graph as the underlying network
 % - The mean has to converge to a reference ref
 
 [x_k_P , y_k_P ] = P_rand(n , p , t_end , x_0 , n_selfish , ref , A_sequence , topology, complete, Kp);
 
 %% STEP 3.1
-%Same assumptions as in STEP 3, but now we introduce a stubborn agent
+%Same assumptions as in STEP 1.1, but now we introduce a stubborn agent
 
+ sum_rows = diag(sum(topology_stubborn , 2))
+ C = (inv(sum_rows) * topology_stubborn)
+ C = C(1:n_selfish , :)
+ CACCA = C*x_0_stubborn
 [x_k_P_stubborn , y_k_P_stubborn] = P_rand_stubborn(n , p , t_end , x_0_stubborn , n_selfish , n_stubborn, ref , A_sequence_stubborn , topology_stubborn, complete, Kp);
     
 

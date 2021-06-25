@@ -42,7 +42,7 @@ plot(0:1:t_end, x_k_PI(n_selfish+1 ,:),  'LineWidth' , 1.5);
 % plot(0:1:t_end, x_k_PI(n+1 ,:),  'LineWidth' , 1.5);
 plot(0:1:t_end , y_k_PI(1 ,:) , 'LineWidth' , 1.5);
 plot(0:1:t_end, ref_seq, 'k .' , 'MarkerSize' , 1.1);
-legend( 'Coordinator 1' ,'Coordinator 2' ,'Coordinator 3' , 'Standard Agent 1' , 'Integrated Error Coordinator 1' , 'Network average' , 'Reference');
+legend( 'Coordinator 1' ,'Coordinator 2' ,'Coordinator 3' , 'Standard Agent 1'  , 'Network average' , 'Reference');
 title('Global, saturation, Mean reference, PI , random sequence');
 hold off;
 
