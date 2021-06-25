@@ -4,14 +4,14 @@ n = 100;
 % Defining the number of nodes to be sampled
 p = 5;
 %Fix simulation length
-t_end = 5000;       
+t_end = 25;       
 %plotting variable
 plotting = false;
 plotting_eig = false;
 lap = false;
 complete = false;
 not_complete = true;
-first = true;
+first = false;
 
 % Defining the initial conditions on the opinions
 x_0 = zeros(n , 1);
@@ -179,7 +179,7 @@ end
 
 %% IMPLEMENTING THE FEEDBACK CONTROL LAW
 % number of coordinators
-n_selfish = 5;
+n_selfish = 2;
 
 % Refererence chosen to be the mean of the standard agents
 ref=mean(x_0(n_selfish+1:end))*ones(n_selfish , 1);
@@ -194,8 +194,9 @@ Ki = 0.01*eye(n_selfish);
 %% DEFINING A TOPOLOGY THAT ALSO HAS A SINGLE MALICIOUS NODE (STUBBORN NODE). THE NETWORK WILL NOW HAVE N+1 NODES
 n_stubborn = 1;
 n_tot = n+n_stubborn;
-topology_stubborn = zeros(n_tot , n_tot);
+
 if first
+    topology_stubborn = zeros(n_tot , n_tot);
     new_connections = zeros( n-n_selfish ,n_stubborn);
     for i = 1:length(new_connections)
         new_connections( i , 1 ) = rand(1);
@@ -319,7 +320,7 @@ end
 % - connected graph as the underlying network
 % - The mean has to converge to a reference ref
 
-[x_k_P , y_k_P ] = P_rand(n , p , t_end , x_0 , n_selfish , ref , A_sequence , topology, complete, Kp);
+%[x_k_P , y_k_P ] = P_rand(n , p , t_end , x_0 , n_selfish , ref , A_sequence , topology, complete, Kp);
 
 %% STEP 3.1
 %Same assumptions as in STEP 3, but now we introduce a stubborn agent
@@ -332,7 +333,7 @@ end
 
 %----SKIP----
 
-[x_k_P_sat , y_k_P_sat] = P_rand_sat(n , p , t_end , x_0 , n_selfish , ref , A_sequence , topology, complete, Kp);
+%[x_k_P_sat , y_k_P_sat] = P_rand_sat(n , p , t_end , x_0 , n_selfish , ref , A_sequence , topology, complete, Kp);
 
 
 %% STEP 3.3
@@ -350,11 +351,15 @@ end
 % - The mean has to converge to a reference ref
 
 
+
 [x_k_PI , y_k_PI] = PI_rand(n , p , t_end , x_0 , n_selfish , ref , A_sequence , topology , complete , Kp , Ki);
 
 % %---PI con più coordinator: la nostra conjecture (caso myopic, NO stubborn)
 % [x_k_PI , y_k_PI] = PI_rand(n , p , t_end , x_0 , n_selfish , ref , A_sequence , Kp , Ki);
 
+
+%---PI con più coordinator: la nostra conjecture (caso myopic, NO stubborn)
+%[x_k_PI , y_k_PI] = PI_rand(n , p , t_end , x_0 , n_selfish , ref , A_sequence , Kp , Ki);
 
 %% STEP 4.1
 % Assumptions:
@@ -366,11 +371,14 @@ end
 % - One stubborn agent
 
 %PI con un coordinator e uno stubborn
-[x_k_PI_stub , y_k_PI_stub] = PI_rand_stub(n , p , t_end , x_0 , n_selfish , ref , A_sequence , Kp , Ki);
+%[x_k_PI_stub , y_k_PI_stub] = PI_rand_stub(n , p , t_end , x_0 , n_selfish , ref , A_sequence , Kp , Ki);
 
 
 %% STEP 4.2
 % Same as 4.1 but with saturation
 
 
-[x_k_PI_stub_sat , y_k_PI_stub_sat] = PI_rand_stub_sat(n , p , t_end , x_0 , n_selfish , ref , A_sequence , Kp , Ki);
+%[x_k_PI_stub_sat , y_k_PI_stub_sat] = PI_rand_stub_sat(n , p , t_end , x_0 , n_selfish , ref , A_sequence , Kp , Ki);
+
+%% STEP 5
+%Assigning coordinators according to centrality measures
