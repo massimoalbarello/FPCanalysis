@@ -188,7 +188,7 @@ ref=mean(x_0(n_selfish+1:end))*ones(n_selfish , 1);
 ref_seq = mean(x_0(n_selfish+1:end)) * ones(t_end+1 , 1);
 
 %Initializing Gains
-Kp =5*eye(n_selfish);
+Kp =0.5*eye(n_selfish);
 Ki = 0.01*eye(n_selfish);
 
 %% DEFINING A TOPOLOGY THAT ALSO HAS A SINGLE MALICIOUS NODE (STUBBORN NODE). THE NETWORK WILL NOW HAVE N+1 NODES
@@ -350,10 +350,7 @@ end
 % - connected graph as the underlying network
 % - The mean has to converge to a reference ref
 
-%[x_k_PI , y_k_PI] = PI_rand(n , p , t_end , x_0 , n_selfish , ref , A_sequence , topology , complete , Kp , Ki);
-
-% %---PI con più coordinator: la nostra conjecture (caso myopic, NO stubborn)
-% [x_k_PI , y_k_PI] = PI_rand(n , p , t_end , x_0 , n_selfish , ref , A_sequence , Kp , Ki);
+[x_k_PI , y_k_PI] = PI_rand(n , p , t_end , x_0 , n_selfish , ref , A_sequence , topology , complete , Kp , Ki);
 
 %% STEP 4.1
 % Assumptions:
@@ -364,13 +361,18 @@ end
 % - The mean has to converge to a reference ref
 % - One stubborn agent
 
-%PI con un coordinator e uno stubborn
-%[x_k_PI_stub , y_k_PI_stub] = PI_rand_stubborn(n , p , t_end , x_0_stubborn , n_selfish , n_stubborn, ref , A_sequence_stubborn , topology_stubborn , complete , Kp , Ki);
+[x_k_PI_stubborn , y_k_PI_stubborn] = PI_rand_stubborn(n , p , t_end , x_0_stubborn , n_selfish , n_stubborn, ref , A_sequence_stubborn , topology_stubborn , complete , Kp , Ki);
 
 
 %% STEP 4.2
+% Same as STEP 4 but with saturation
+
+[x_k_PI_sat , y_k_PI_sat] = PI_rand_sat(n , p , t_end , x_0 , n_selfish , ref , A_sequence , topology , complete, Kp , Ki);
+
+
+%% STEP 4.3
 % Same as 4.1 but with saturation
-%[x_k_PI_stub_sat , y_k_PI_stub_sat] = PI_rand_sat_stubborn(n , p , t_end , x_0_stubborn , n_selfish , n_stubborn, ref , A_sequence_stubborn , topology_stubborn , complete , Kp , Ki);
+[x_k_PI_stub_sat , y_k_PI_stub_sat] = PI_rand_sat_stubborn(n , p , t_end , x_0_stubborn , n_selfish , n_stubborn, ref , A_sequence_stubborn , topology_stubborn , complete , Kp , Ki);
 
 %% STEP 5
 %Assigning coordinators according to centrality measures
