@@ -54,14 +54,6 @@ if complete
     row_sum = sum(A_sequence,2);
     col_sum = sum(A_sequence,1);
 
-    
-%% CENTRALITY MEASURES
-    % choose one
-%     centrality_vector = centrality(average_G,'pagerank');
-%     centrality_vector = centrality(average_G,'outdegree'); % E[A(k)] symmetric --> same as 'indegree'
-%     centrality_vector = centrality(average_G,'betweenness');
-
-%     A = permute_matrix(centrality_vector,n_selfish,average_A)
 
 %% GENERATING AN ARBITRARY TOPOLOGY (LOOK AT GRAPH_GEN FOR MORE DETAIL), THE NODES CAN SAMPLE FORM THE NEIGHBOURS ONLY, BUT ALWATS SAMPLE THEMSELVES
 elseif not_complete
@@ -131,8 +123,16 @@ elseif not_complete
    end
 end
 
+%% CENTRALITY MEASURES
+    % choose one
+%     centrality_vector = centrality(average_G,'pagerank');
+%     centrality_vector = centrality(average_G,'outdegree'); % E[A(k)] symmetric --> same as 'indegree'
+%     centrality_vector = centrality(average_G,'betweenness');
 
-
+%     P = permute_matrix(centrality_vector,n_selfish,n)
+%     for i = 1:t_end
+%         A_sequence(:,:,i) = P*A_sequence(:,:,i)*P';
+%     end
 
 %% EVOLUTION OF THE STATE
     %State evolution of the dicrete time system (Randomized)
@@ -192,8 +192,9 @@ ref=mean(x_0(n_selfish+1:end))*ones(n_selfish , 1);
 ref_seq = mean(x_0(n_selfish+1:end)) * ones(t_end+1 , 1);
 
 %Initializing Gains
-Kp =0.5*eye(n_selfish);
-Ki = 0.01*eye(n_selfish);
+Kp =5*eye(n_selfish);
+Ki = 0.5*eye(n_selfish);
+
 
 %% DEFINING A TOPOLOGY THAT ALSO HAS A SINGLE MALICIOUS NODE (STUBBORN NODE). THE NETWORK WILL NOW HAVE N+1 NODES
 n_stubborn = 1;

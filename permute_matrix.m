@@ -1,19 +1,5 @@
-% A = [1 1 0;...
-%     1 1 1;...
-%     0 1 0];
-% n_c = 1;
-% G = graph(A);
-% figure(1)
-% plot(G)
-% centrality_vector = centrality(G,'degree');
-% A_permuted = permute_matrixl(centrality_vector,n_c,A);
-% G_permuted = graph(A_permuted)
-% figure(2)
-% plot(G_permuted)
+function P_matrix = permute_matrix(centrality_vector,n_c,n)
 
-function A_permuted = permute_matrix(centrality_vector,n_c,Adj_matrix)
-
-n = size(Adj_matrix,1);
 max_centrality = zeros(n_c,2); % max value in first column, index in the second
 
 [max_centrality(:,1),max_centrality(:,2)] = maxk(centrality_vector,n_c);
@@ -26,7 +12,5 @@ for i = 1:n_c
     P_matrix(:,max_centrality(i,2)) = P_matrix(:,i);
     P_matrix(:,i)=row;
 end    
-
-A_permuted = P_matrix*Adj_matrix*P_matrix';
 
 end
