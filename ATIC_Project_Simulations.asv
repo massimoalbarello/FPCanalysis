@@ -56,12 +56,11 @@ if complete
 
     
 %% CENTRALITY MEASURES
-    % choose one
-%     centrality_vector = centrality(average_G,'pagerank');
-%     centrality_vector = centrality(average_G,'outdegree'); % E[A(k)] symmetric --> same as 'indegree'
-%     centrality_vector = centrality(average_G,'betweenness');
+    centrality_vector = centrality(average_G,'pagerank');
+    centrality_vector = centrality(average_G,'outdegree'); % E[A(k)] symmetric --> same as 'indegree'
+    centrality_vector = centrality(average_G,'betweenness');
 
-%     A = permute_matrix(centrality_vector,n_selfish,average_A)
+    A = permute_matrix(centrality_vector,n_selfish,average_A)
 
 %% GENERATING AN ARBITRARY TOPOLOGY (LOOK AT GRAPH_GEN FOR MORE DETAIL), THE NODES CAN SAMPLE FORM THE NEIGHBOURS ONLY, BUT ALWATS SAMPLE THEMSELVES
 elseif not_complete
@@ -98,6 +97,7 @@ elseif not_complete
                 end
             end
 
+
             if ((Summation==0) && (Irreducibility == 1))
                 fprintf('Need more neighbours, Irreducible\n');
             elseif ((Summation==1) && (Irreducibility == 1))
@@ -112,6 +112,7 @@ elseif not_complete
                  fprintf('I forgot one case\n');
                  bad_topology = false;
             end
+
         end
 
         % Choose a network for the simulations from now on (play with it...)

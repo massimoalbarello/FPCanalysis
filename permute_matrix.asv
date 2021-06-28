@@ -1,15 +1,8 @@
-% A = [1 1 0;...
-%     1 1 1;...
-%     0 1 0];
-% n_c = 1;
-% G = graph(A);
-% figure(1)
-% plot(G)
-% centrality_vector = centrality(G,'degree');
-% A_permuted = permute_matrixl(centrality_vector,n_c,A);
-% G_permuted = graph(A_permuted)
-% figure(2)
-% plot(G_permuted)
+A = [1 0];
+n_c = 2;
+G = graph(A);
+centrality_vector = centrality(G,'degree');
+
 
 function A_permuted = permute_matrix(centrality_vector,n_c,Adj_matrix)
 
