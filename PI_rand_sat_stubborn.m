@@ -38,23 +38,28 @@ y_k_PI(: , 1) = C*x_0_stubborn;
 % Building the sequence of state matrices for PI-Controlled Closed Loop 
 for k  = 1:t_end
     A_PI_sequence(: , : , k) = [A_sequence_stubborn(: , : , k)-B*Kp*C , B*Ki ; -C , eye(n_selfish)];
-    x_k_PI(1:n+n_stubborn , k+1) = sat_function(A_PI_sequence(1:n+n_stubborn , : , k) * x_k_PI(: , k) + B*Kp*ref);
-    x_k_PI(n+n_stubborn+1:end , k+1) = -C * x_k_PI(1:n+n_stubborn , k) + eye(n_selfish)*x_k_PI(n+n_stubborn+1:end , k);
+    x_k_PI(:, k+1) = A_PI_sequence(: , : , k) * x_k_PI(: , k) + [B*Kp ; eye(n_selfish)]*ref;
+    x_k_PI(1:n+n_stubborn,k+1) = sat_function(x_k_PI(1:n+n_stubborn,k+1));
     y_k_PI(: , k+1) = C * x_k_PI(1:n+n_stubborn , k+1);
+    disp(x_k_PI(n+n_stubborn+1,k));
 end
+
 
 %Plotting opinion Dynamics
 figure(207) ;  hold on;
 plot(0:1:t_end , x_k_PI(1:n_selfish ,:) ,  'LineWidth' , 1.5); hold on;
-plot(0:1:t_end, x_k_PI(n_selfish+1 ,:),  'LineWidth' , 1.5);
+%plot(0:1:t_end, x_k_PI(n_selfish+1 ,:),  'LineWidth' , 1.5);
 plot(0:1:t_end, x_k_PI(n+1 ,:),  'LineWidth' , 1.5);
 % plot(0:1:t_end, x_k_PI(n + n_stubborn + 1 ,:),  'LineWidth' , 1.5);
 plot(0:1:t_end , y_k_PI , 'LineWidth' , 1.5);
-plot(0:1:t_end , mean(x_k_PI , 1) ,'y- o', 'LineWidth' , 1.5);
+plot(0:1:t_end , mean(x_k_PI(1:n+n_stubborn,:) , 1) , 'LineWidth' , 1.5);
 plot(0:1:t_end, ref_seq, 'k -.' , 'MarkerSize' , 1.1);
-legend( 'Coordinator 1' ,'Coordinator 2' , 'Standard Agent 1' , 'Malicious Agent' , 'Measurement 1' , 'Measurement 2' , 'Global Network Average' , 'Reference' , 'Location' , 'SouthEast');
+legend( 'Coordinator', 'Malicious Agent' , 'Measurement', 'Global Network Average' , 'Reference' , 'Location' , 'SouthEast');
 %title('Saturation, stubborn agent, Mean reference, PI , random sequence');
-axis([-Inf Inf -Inf Inf]);
+pbaspect([1.5 1 1]);
+xlabel('Time (k)');
+ylabel('Opinion');
+axis([-Inf Inf -0.1 1.1]);
 hold off;
 
 end

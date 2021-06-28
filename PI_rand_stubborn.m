@@ -51,10 +51,12 @@ plot(0:1:t_end, x_k_PI(n+1 ,:),  'LineWidth' , 1.5);
 plot(0:1:t_end , y_k_PI , 'LineWidth' , 1.5);
 plot(0:1:t_end , mean(x_k_PI , 1) , 'LineWidth' , 1.5);
 plot(0:1:t_end, ref_seq, 'k -.' , 'MarkerSize' , 1.1);
-legend( 'Coordinator 1' , 'Malicious Agent' ,  'Measurement 1' , 'Global Network average' , 'Reference', 'Location' , 'SouthEast');
+legend( 'Coordinator' , 'Malicious Agent' ,  'Measurement' , 'Global Network average' , 'Reference', 'Location' , 'SouthEast');
 %title('NO saturation, stubborn agent, Mean reference, PI , random sequence');
 pbaspect([1.5 1 1]);
-axis([-Inf Inf -0.1 1.4]);
+xlabel('Time (k)');
+ylabel('Opinion');
+axis([-Inf Inf -0.1 1.3]);
 hold off;
 
 end

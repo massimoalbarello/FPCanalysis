@@ -44,14 +44,15 @@ figure(105) ;  hold on;
 plot(0:1:t_end , x_k_P(1:n_selfish ,:) ,  'LineWidth' , 1.5); hold on;
 % plot(0:1:t_end, x_k_P(n_selfish+1 ,:),  'LineWidth' , 1.5);
 plot(0:1:t_end, x_k_P(n+1:end ,:),  'LineWidth' , 1.5);
-plot(0:1:t_end, x_k_P(n+1:end ,:),  'LineWidth' , 1.5);
 plot(0:1:t_end , y_k_P(: ,:) , 'LineWidth' , 1.5);
 plot(0:1:t_end , mean(x_k_P , 1) , 'LineWidth' , 1.5);
 plot(0:1:t_end, ref_seq, 'k -.' , 'MarkerSize' , 1.1);
 % title('No saturation, stubborn agent, Mean reference, P , random sequence');
-legend( 'Coordinator 1' ,'Coordinator 2' , 'Malicious Agent' , 'Malicious Agent' ,'Measurement 1', 'Measurement 2', 'Global Network Average' , 'Reference' , 'Location' , 'SouthEast');
+legend( 'Coordinator 1' ,'Coordinator 2' , 'Malicious Agent' ,'Measurement 1', 'Measurement 2', 'Global Network Average' , 'Reference' , 'Location' , 'SouthEast');
 pbaspect([1.5 1 1]);
-axis([-Inf Inf -0.1 1.1]);
+axis([-Inf Inf -0.1 1.5]);
+xlabel('Time (k)');
+ylabel('Opinion');
 hold off;
 
 end

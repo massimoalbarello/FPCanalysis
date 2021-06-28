@@ -12,7 +12,7 @@ plotting_eig = false;
 lap = false;
 complete = false;
 not_complete = true;
-first = false;
+    first = false;
 
 % Defining the initial conditions on the opinions
 x_0 = zeros(n , 1);
@@ -193,7 +193,7 @@ ref=mean(x_0(n_selfish+1:end))*ones(n_selfish , 1);
 ref_seq = mean(x_0(n_selfish+1:end)) * ones(t_end+1 , 1);
 
 %Initializing Gains
-Kp =5*eye(n_selfish);
+Kp =10*eye(n_selfish);
 Ki = 0.5*eye(n_selfish);
 
 %% DEFINING A TOPOLOGY THAT ALSO HAS A SINGLE MALICIOUS NODE (STUBBORN NODE). THE NETWORK WILL NOW HAVE N+1 NODES
@@ -325,7 +325,7 @@ end
 % - connected graph as the underlying network
 % - The mean has to converge to a reference ref
 
-[x_k_P , y_k_P ] = P_rand(n , p , t_end , x_0 , n_selfish , ref , A_sequence , topology, complete, Kp);
+% [x_k_P , y_k_P ] = P_rand(n , p , t_end , x_0 , n_selfish , ref , A_sequence , topology, complete, Kp);
 
 %% STEP 3.1
 %Same assumptions as in STEP 3, but now we introduce a stubborn agent
@@ -338,7 +338,7 @@ end
 
 %----SKIP----
 
-%[x_k_P_sat , y_k_P_sat] = P_rand_sat(n , p , t_end , x_0 , n_selfish , ref , A_sequence , topology, complete, Kp);
+% [x_k_P_sat , y_k_P_sat] = P_rand_sat(n , p , t_end , x_0 , n_selfish , ref , A_sequence , topology, complete, Kp);
 
 
 %% STEP 3.3
@@ -374,19 +374,16 @@ end
 % - The mean has to converge to a reference ref
 % - One stubborn agent
 
-[x_k_PI_stubborn , y_k_PI_stubborn] = PI_rand_stubborn(n , p , t_end , x_0_stubborn , n_selfish , n_stubborn, ref , A_sequence_stubborn , topology_stubborn , complete , Kp , Ki);
+%[x_k_PI_stubborn , y_k_PI_stubborn] = PI_rand_stubborn(n , p , t_end , x_0_stubborn , n_selfish , n_stubborn, ref , A_sequence_stubborn , topology_stubborn , complete , Kp , Ki);
 
 
 %% STEP 4.2
 % Same as STEP 4 but with saturation
 
-[x_k_PI_sat , y_k_PI_sat] = PI_rand_sat(n , p , t_end , x_0 , n_selfish , ref , A_sequence , topology , complete, Kp , Ki);
+% [x_k_PI_sat , y_k_PI_sat] = PI_rand_sat(n , p , t_end , x_0 , n_selfish , ref , A_sequence , topology , complete, Kp , Ki);
 
 
 %% STEP 4.3
 % Same as 4.1 but with saturation
-[x_k_PI_stub_sat , y_k_PI_stub_sat] = PI_rand_sat_stubborn(n , p , t_end , x_0_stubborn , n_selfish , n_stubborn, ref , A_sequence_stubborn , topology_stubborn , complete , Kp , Ki);
-
-%% STEP 5
-%Assigning coordinators according to centrality measures
+%[x_k_PI_stub_sat , y_k_PI_stub_sat] = PI_rand_sat_stubborn(n , p , t_end , x_0_stubborn , n_selfish , n_stubborn, ref , A_sequence_stubborn , topology_stubborn , complete , Kp , Ki);
 

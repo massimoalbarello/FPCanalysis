@@ -50,6 +50,8 @@ plot(0:1:t_end, ref_seq, 'k -.' , 'MarkerSize' , 1.1);
 legend( 'Coordinator 1' ,'Coordinator 2' , 'Integrated Error Coordinator 1' , 'Measurement 1' , 'Measurement 2' , 'Global Network Average' , 'Reference' , 'Location' , 'SouthEast');
 %title('NO saturation, Mean reference, PI , random sequence');
 pbaspect([1.5 1 1]);
+xlabel('Time (k)');
+ylabel('Opinion');
 hold off;
 
 end
