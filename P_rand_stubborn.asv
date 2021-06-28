@@ -1,5 +1,4 @@
-function [x_k_P , y_k_P] = P_rand_sat_stubborn(n , p , t_end , x_0_stubborn, n_selfish , n_stubborn, ref , A_sequence, topology_stubborn, complete, Kp);
-
+function [x_k_P , y_k_P ] = P_rand_stubborn(n , p , t_end , x_0_stubborn, n_selfish , n_stubborn, ref , A_sequence, topology_stubborn, complete, Kp);
 
 %Function giving the following output of a P-controlled system with global or myopic
 %visibility, using the random sequence of i.i.d. matrices
@@ -8,12 +7,15 @@ function [x_k_P , y_k_P] = P_rand_sat_stubborn(n , p , t_end , x_0_stubborn, n_s
 % - stubborn agents (= malicious nodes)
 % - network average evolution
 
+y_k_P = zeros(n_selfish , t_end+1);
+
 % Reference sequence (for plots)
 ref_seq = mean(x_0_stubborn(n_selfish+1:end)) * ones(t_end+1 , 1);
 
 % State-Space Representation 
 A_P_sequence = zeros(n+n_stubborn , n+n_stubborn , t_end);
 B = [eye(n_selfish) ; zeros(n - n_selfish + n_stubborn , n_selfish)];
+C= zeros(n_selfish , length(x_0_stubborn));
 
 if complete
     C = (1/n)*[ones(n_selfish , n + n_stubborn)];
@@ -33,24 +35,23 @@ y_k_P(: , 1) = C * x_0_stubborn;
 % Building the sequence of state matrices for PI-Controlled Closed Loop 
 for k  = 1:t_end
     A_P_sequence(: , : , k) = A_sequence(: , : , k)-B*Kp*C ;
-    x_k_P(: , k+1) = sat_function(A_P_sequence(: , : , k) * x_k_P(: , k) + B*Kp*ref);
+    x_k_P(: , k+1) = A_P_sequence(: , : , k) * x_k_P(: , k) + B*Kp*ref;
     y_k_P(: , k+1) = C * x_k_P(: , k+1);
 end
 
 %Plotting opinion Dynamics
-figure(107) ;  hold on;
+figure(105) ;  hold on;
 plot(0:1:t_end , x_k_P(1:n_selfish ,:) ,  'LineWidth' , 1.5); hold on;
-plot(0:1:t_end, x_k_P(n_selfish+1 ,:),  'LineWidth' , 1.5);
+% plot(0:1:t_end, x_k_P(n_selfish+1 ,:),  'LineWidth' , 1.5);
 plot(0:1:t_end, x_k_P(n+1:end ,:),  'LineWidth' , 1.5);
 plot(0:1:t_end , y_k_P(: ,:) , 'LineWidth' , 1.5);
 plot(0:1:t_end , mean(x_k_P , 1) , 'LineWidth' , 1.5);
 plot(0:1:t_end, ref_seq, 'k -.' , 'MarkerSize' , 1.1);
-legend( 'Coordinator 1' ,'Coordinator 2' , 'Standard Agent 1' , 'Malicious Agent' ,'Measurement 1', 'Measurement 2', 'Global Network Average', 'Reference' , 'Location' , 'SouthEast');
-%title('Saturation, stubborn agent, Mean reference, P , random sequence');
+% title('No saturation, stubborn agent, Mean reference, P , random sequence');
+legend( 'Coordinator 1' ,'Coordinator 2' , 'Malicious Agent' ,'Measurement 1', 'Measurement 2', 'Global Network Average' , 'Reference' , 'Location' , 'SouthEast');
 pbaspect([1.5 1 1]);
 axis([-Inf Inf -0.1 1.1]);
 hold off;
-
 
 end
 
