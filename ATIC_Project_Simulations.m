@@ -47,9 +47,7 @@ if complete
     average_mask = p/(n-1)*(ones(n)-eye(n))+eye(n);
     average_A = average_mask * (1/(p+1));
     average_G = digraph(average_A);
-    
-%     [pagerank,indices] = maxk(centrality(average_G,'pagerank'),n_selfish);
-    
+        
 
     %Check row stochasticity of A (satisfied)
     row_sums = sum(average_A,2);
@@ -93,7 +91,6 @@ elseif not_complete
                 end
             end
 
-
             if ((Summation==0) && (Irreducibility == 1))
                 fprintf('Need more neighbours, Irreducible\n');
             elseif ((Summation==1) && (Irreducibility == 1))
@@ -108,7 +105,6 @@ elseif not_complete
                  fprintf('I forgot one case\n');
                  bad_topology = false;
             end
-
         end
 
         % Choose a network for the simulations from now on (play with it...)
@@ -128,8 +124,16 @@ elseif not_complete
    end
 end
 
+%% CENTRALITY MEASURES
+    % choose one
+%     centrality_vector = centrality(average_G,'pagerank');
+%     centrality_vector = centrality(average_G,'outdegree'); % E[A(k)] symmetric --> same as 'indegree'
+%     centrality_vector = centrality(average_G,'betweenness');
 
-
+%     P = permute_matrix(centrality_vector,n_selfish,n)
+%     for i = 1:t_end
+%         A_sequence(:,:,i) = P*A_sequence(:,:,i)*P';
+%     end
 
 %% EVOLUTION OF THE STATE
     %State evolution of the dicrete time system (Randomized)
