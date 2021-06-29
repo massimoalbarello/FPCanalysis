@@ -40,18 +40,19 @@ for k  = 1:t_end
 end
 
 %Plotting opinion Dynamics
-figure(204) ;  hold on;
+figure(200) ;  hold on;
 plot(0:1:t_end , x_k_PI(1:2 ,:) ,  'LineWidth' , 1.5); hold on;
 % plot(0:1:t_end, x_k_PI(n_selfish+1 ,:),  'LineWidth' , 1.5);
-plot(0:1:t_end, x_k_PI(n+1 ,:),  'LineWidth' , 1.5);
+% plot(0:1:t_end, x_k_PI(n+1 ,:),  'LineWidth' , 1.5);
 plot(0:1:t_end , y_k_PI , 'LineWidth' , 1.5);
-plot(0:1:t_end , mean(x_k_PI , 1) , 'LineWidth' , 1.5);
+plot(0:1:t_end , mean(x_k_PI(1:n,:)  , 1) , 'LineWidth' , 1.5);
 plot(0:1:t_end, ref_seq, 'k -.' , 'MarkerSize' , 1.1);
-legend( 'Coordinator 1' ,'Coordinator 2' , 'Integrated Error Coordinator 1' , 'Measurement 1' , 'Measurement 2' , 'Global Network Average' , 'Reference' , 'Location' , 'SouthEast');
+legend( 'Coordinator 1' ,'Coordinator 2' , 'Measurement 1' , 'Measurement 2' , 'Global Network Average' , 'Reference' , 'Location' , 'SouthEast');
 %title('NO saturation, Mean reference, PI , random sequence');
 pbaspect([1.5 1 1]);
 xlabel('Time (k)');
 ylabel('Opinion');
+axis([-Inf Inf -Inf Inf]);
 hold off;
 
 end

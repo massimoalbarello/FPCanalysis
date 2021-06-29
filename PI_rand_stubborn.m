@@ -13,7 +13,7 @@ function [x_k_PI , y_k_PI] = PI_rand_stubborn(n , p , t_end , x_0_stubborn , n_s
 % - network average evolution
 
 % Reference sequence (for plots)
-ref_seq = mean(x_0_stubborn(n_selfish+1:end)) * ones(t_end+1 , 1);
+ref_seq = mean(x_0_stubborn) * ones(t_end+1 , 1);
 
 % State-Space Representation 
 A_PI_sequence = zeros(n+n_selfish+n_stubborn , n+n_selfish+n_stubborn , t_end);
@@ -43,20 +43,20 @@ for k  = 1:t_end
 end
 
 %Plotting opinion Dynamics
-figure(205) ;  hold on;
+figure(201) ;  hold on;
 plot(0:1:t_end , x_k_PI(1:n_selfish ,:) ,  'LineWidth' , 1.5); hold on;
 % plot(0:1:t_end, x_k_PI(n_selfish+1 ,:),  'LineWidth' , 1.5);
 plot(0:1:t_end, x_k_PI(n+1 ,:),  'LineWidth' , 1.5);
 % plot(0:1:t_end, x_k_PI(n + n_stubborn + 1 ,:),  'LineWidth' , 1.5);
 plot(0:1:t_end , y_k_PI , 'LineWidth' , 1.5);
-plot(0:1:t_end , mean(x_k_PI , 1) , 'LineWidth' , 1.5);
+plot(0:1:t_end , mean(x_k_PI(1:n+n_stubborn,:) , 1) , 'LineWidth' , 1.5);
 plot(0:1:t_end, ref_seq, 'k -.' , 'MarkerSize' , 1.1);
 legend( 'Coordinator' , 'Malicious Agent' ,  'Measurement' , 'Global Network average' , 'Reference', 'Location' , 'SouthEast');
 %title('NO saturation, stubborn agent, Mean reference, PI , random sequence');
 pbaspect([1.5 1 1]);
 xlabel('Time (k)');
 ylabel('Opinion');
-axis([-Inf Inf -0.1 1.3]);
+axis([-Inf Inf -Inf Inf]);
 hold off;
 
 end

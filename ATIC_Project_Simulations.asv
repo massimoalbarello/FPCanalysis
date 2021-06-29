@@ -8,7 +8,7 @@ n = 100;
 % Defining the number of nodes to be sampled
 p = 5;
 %Fix simulation length
-t_end = 100;
+t_end = 500;
 complete=false;
 
 %Seed for initial conditions in which we have a clear majority for op. 1
@@ -90,7 +90,7 @@ ref=mean(x_0)*ones(n_selfish , 1);
 ref_seq = mean(x_0) * ones(t_end+1 , 1);
 
 %Initializing Gains
-Kp =5*eye(n_selfish);
+Kp =10*eye(n_selfish);
 Ki = 1*eye(n_selfish);
 
 %% DEFINING A TOPOLOGY THAT ALSO HAS A SINGLE MALICIOUS NODE (STUBBORN NODE). THE NETWORK WILL NOW HAVE N+1 NODES
@@ -134,9 +134,9 @@ ref_stubborn= mean(x_0_stubborn);
 
 %% CENTRALITY MEASURES
     % choose one
-% centrality_vector = centrality(average_G,'pagerank');
-%    centrality_vector = centrality(average_G,'outdegree'); % E[A(k)] symmetric --> same as 'indegree'
-%   centrality_vector = centrality(average_G,'betweenness');
+%     centrality_vector = centrality(average_G,'pagerank');
+%     centrality_vector = centrality(average_G,'outdegree'); % E[A(k)] symmetric --> same as 'indegree'
+%     centrality_vector = centrality(average_G,'betweenness');
 
 %      P = permute_matrix(centrality_vector,n_selfish,n);
 %      for i = 1:t_end
@@ -165,35 +165,35 @@ disp('------------------');
 % - connected graph as the underlying network
 % - The mean has to converge to a reference ref
 
-% [x_k_P , y_k_P ] = P_rand(n , p , t_end , x_0 , n_selfish , ref , A_sequence , topology, complete, Kp);
-% disp('P_2_coordinators');
-% disp('time of convergence');
-% disp(time_of_convergence(ref(1),tol,mean(x_k_P),t_end));
-% disp('Kp:');
-% disp(Kp(1,1));
-% disp('-----------------');
+[x_k_P , y_k_P ] = P_rand(n , p , t_end , x_0 , n_selfish , ref , A_sequence , topology, complete, Kp);
+disp('P_2_coordinators');
+disp('time of convergence');
+disp(time_of_convergence(ref(1),tol,mean(x_k_P),t_end));
+disp('Kp:');
+disp(Kp(1,1));
+disp('-----------------');
 
 %% STEP 1.1
 %Same assumptions as in STEP 3, but now we introduce a stubborn agent
 
-% [x_k_P_stubborn , y_k_P_stubborn] = P_rand_stubborn(n , p , t_end , x_0_stubborn , n_selfish , n_stubborn, [ref_stubborn;ref_stubborn], A_sequence_stubborn , topology_stubborn, complete, Kp);
-% disp('P_stubborn');
-% disp('time of convergence');
-% disp(time_of_convergence(ref_stubborn,tol,mean(x_k_P_stubborn),t_end));
-% disp('Kp:');
-% disp(Kp(1,1));
-% disp('-----------------');
+[x_k_P_stubborn , y_k_P_stubborn] = P_rand_stubborn(n , p , t_end , x_0_stubborn , n_selfish , n_stubborn, [ref_stubborn;ref_stubborn], A_sequence_stubborn , topology_stubborn, complete, Kp);
+disp('P_stubborn');
+disp('time of convergence');
+disp(time_of_convergence(ref_stubborn,tol,mean(x_k_P_stubborn),t_end));
+disp('Kp:');
+disp(Kp(1,1));
+disp('-----------------');
 
 %% STEP 1.2
 % Same as STEP 1.2 but with stubborn agent disturbance
 
-% [x_k_P_sat_stubborn , y_k_P_sat_stubborn] = P_rand_sat_stubborn(n , p , t_end , x_0_stubborn , n_selfish , n_stubborn, [ref_stubborn;ref_stubborn] , A_sequence_stubborn , topology_stubborn, complete, Kp);
-% disp('P_sat_stubborn');
-% disp('time of convergence');
-% disp(time_of_convergence(ref_stubborn,tol,mean(x_k_P_sat_stubborn),t_end));
-% disp('Kp:');
-% disp(Kp(1,1));
-% disp('-----------------');
+[x_k_P_sat_stubborn , y_k_P_sat_stubborn] = P_rand_sat_stubborn(n , p , t_end , x_0_stubborn , n_selfish , n_stubborn, [ref_stubborn;ref_stubborn] , A_sequence_stubborn , topology_stubborn, complete, Kp);
+disp('P_sat_stubborn');
+disp('time of convergence');
+disp(time_of_convergence(ref_stubborn,tol,mean(x_k_P_sat_stubborn),t_end));
+disp('Kp:');
+disp(Kp(1,1));
+disp('-----------------');
 %% STEP 2
 % Assumptions:
 % - n_selfish coordinators IOTA NODES that are PI-CONTROLLED
@@ -204,15 +204,15 @@ disp('------------------');
 
 
 
-% [x_k_PI , y_k_PI] = PI_rand(n , p , t_end , x_0 , n_selfish , ref , A_sequence , topology , complete , Kp , Ki);
-% disp('PI_2_coordinators');
-% disp('time of convergence');
-% disp(time_of_convergence(ref(1),tol,mean(x_k_PI(1:n,:) , 1),t_end));
-% disp('Kp:');
-% disp(Kp(1,1));
-% disp('Ki:');
-% disp(Ki(1,1));
-% disp('-----------------');
+[x_k_PI , y_k_PI] = PI_rand(n , p , t_end , x_0 , n_selfish , ref , A_sequence , topology , complete , Kp , Ki);
+disp('PI_2_coordinators');
+disp('time of convergence');
+disp(time_of_convergence(ref(1),tol,mean(x_k_PI(1:n,:) , 1),t_end));
+disp('Kp:');
+disp(Kp(1,1));
+disp('Ki:');
+disp(Ki(1,1));
+disp('-----------------');
 
 
 %% IMPLEMENTING THE FEEDBACK CONTROL LAW
@@ -220,8 +220,8 @@ disp('------------------');
 n_selfish = 1;
 
 %Initializing Gains
-Kp =5*eye(n_selfish);
-Ki = 1*eye(n_selfish);
+Kp =10*eye(n_selfish);
+Ki = *eye(n_selfish);
 
 %% STEP 2.1
 % Assumptions:
@@ -232,15 +232,15 @@ Ki = 1*eye(n_selfish);
 % - The mean has to converge to a reference ref
 % - One stubborn agent
 
-% [x_k_PI_stubborn , y_k_PI_stubborn] = PI_rand_stubborn(n , p , t_end , x_0_stubborn , n_selfish , n_stubborn, ref_stubborn , A_sequence_stubborn , topology_stubborn , complete , Kp , Ki);
-% disp('PI_stubborn');
-% disp('time of convergence');
-% disp(time_of_convergence(ref_stubborn,tol,mean(x_k_PI_stubborn(1:n+n_stubborn,:) , 1),t_end));
-% disp('Kp:');
-% disp(Kp(1,1));
-% disp('Ki:');
-% disp(Ki(1,1));
-% disp('-----------------');
+[x_k_PI_stubborn , y_k_PI_stubborn] = PI_rand_stubborn(n , p , t_end , x_0_stubborn , n_selfish , n_stubborn, ref_stubborn , A_sequence_stubborn , topology_stubborn , complete , Kp , Ki);
+disp('PI_stubborn');
+disp('time of convergence');
+disp(time_of_convergence(ref_stubborn,tol,mean(x_k_PI_stubborn(1:n+n_stubborn,:) , 1),t_end));
+disp('Kp:');
+disp(Kp(1,1));
+disp('Ki:');
+disp(Ki(1,1));
+disp('-----------------');
 
 %% STEP 2.2
 % Same as 2.1 but with saturation

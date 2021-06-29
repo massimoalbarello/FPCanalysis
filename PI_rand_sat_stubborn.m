@@ -13,7 +13,7 @@ function [x_k_PI , y_k_PI] = PI_rand_sat_stubborn(n , p , t_end , x_0_stubborn ,
 % - network average evolution
 
 % Reference sequence (for plots)
-ref_seq = mean(x_0_stubborn(n_selfish+1:end)) * ones(t_end+1 , 1);
+ref_seq = mean(x_0_stubborn) * ones(t_end+1 , 1);
 
 % State-Space Representation 
 A_PI_sequence = zeros(n+n_selfish+n_stubborn , n+n_selfish+n_stubborn , t_end);
@@ -41,12 +41,11 @@ for k  = 1:t_end
     x_k_PI(:, k+1) = A_PI_sequence(: , : , k) * x_k_PI(: , k) + [B*Kp ; eye(n_selfish)]*ref;
     x_k_PI(1:n+n_stubborn,k+1) = sat_function(x_k_PI(1:n+n_stubborn,k+1));
     y_k_PI(: , k+1) = C * x_k_PI(1:n+n_stubborn , k+1);
-    disp(x_k_PI(n+n_stubborn+1,k));
 end
 
 
 %Plotting opinion Dynamics
-figure(207) ;  hold on;
+figure(202) ;  hold on;
 plot(0:1:t_end , x_k_PI(1:n_selfish ,:) ,  'LineWidth' , 1.5); hold on;
 %plot(0:1:t_end, x_k_PI(n_selfish+1 ,:),  'LineWidth' , 1.5);
 plot(0:1:t_end, x_k_PI(n+1 ,:),  'LineWidth' , 1.5);
@@ -59,7 +58,8 @@ legend( 'Coordinator', 'Malicious Agent' , 'Measurement', 'Global Network Averag
 pbaspect([1.5 1 1]);
 xlabel('Time (k)');
 ylabel('Opinion');
-axis([-Inf Inf -0.1 1.1]);
+axis([-Inf Inf -Inf Inf]);
 hold off;
+
 
 end

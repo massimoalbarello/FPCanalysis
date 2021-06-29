@@ -10,7 +10,7 @@ function [x_k_P , y_k_P ] = P_rand_stubborn(n , p , t_end , x_0_stubborn, n_self
 y_k_P = zeros(n_selfish , t_end+1);
 
 % Reference sequence (for plots)
-ref_seq = mean(x_0_stubborn(n_selfish+1:end)) * ones(t_end+1 , 1);
+ref_seq = mean(x_0_stubborn) * ones(t_end+1 , 1);
 
 % State-Space Representation 
 A_P_sequence = zeros(n+n_stubborn , n+n_stubborn , t_end);
@@ -40,7 +40,7 @@ for k  = 1:t_end
 end
 
 %Plotting opinion Dynamics
-figure(105) ;  hold on;
+figure(101) ;  hold on;
 plot(0:1:t_end , x_k_P(1:n_selfish ,:) ,  'LineWidth' , 1.5); hold on;
 % plot(0:1:t_end, x_k_P(n_selfish+1 ,:),  'LineWidth' , 1.5);
 plot(0:1:t_end, x_k_P(n+1:end ,:),  'LineWidth' , 1.5);
@@ -50,9 +50,9 @@ plot(0:1:t_end, ref_seq, 'k -.' , 'MarkerSize' , 1.1);
 % title('No saturation, stubborn agent, Mean reference, P , random sequence');
 legend( 'Coordinator 1' ,'Coordinator 2' , 'Malicious Agent' ,'Measurement 1', 'Measurement 2', 'Global Network Average' , 'Reference' , 'Location' , 'SouthEast');
 pbaspect([1.5 1 1]);
-axis([-Inf Inf -0.1 1.5]);
 xlabel('Time (k)');
 ylabel('Opinion');
+axis([-Inf Inf -Inf Inf]);
 hold off;
 
 end
