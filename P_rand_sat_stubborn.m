@@ -38,7 +38,7 @@ for k  = 1:t_end
 end
 
 %Plotting opinion Dynamics
-figure(107) ;  hold on;
+figure(102) ;  hold on;
 plot(0:1:t_end , x_k_P(1:n_selfish ,:) ,  'LineWidth' , 1.5); hold on;
 % plot(0:1:t_end, x_k_P(n_selfish+1 ,:),  'LineWidth' , 1.5);
 plot(0:1:t_end, x_k_P(n+1:end ,:),  'LineWidth' , 1.5);
@@ -50,7 +50,7 @@ legend( 'Coordinator 1' ,'Coordinator 2' , 'Malicious Agent' ,'Measurement 1', '
 pbaspect([1.5 1 1]);
 xlabel('Time (k)');
 ylabel('Opinion');
-axis([-Inf Inf -0.1 1.1]);
+axis([-Inf Inf -Inf Inf]);
 hold off;
 
 
